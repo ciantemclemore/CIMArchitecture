@@ -37,5 +37,22 @@ namespace CIMArchitecture
             }
             return instructions;
         }
+
+        public List<string> GatherUserInstructions()
+        {
+            string key = "run";
+            while (true)
+            {
+                Console.WriteLine("Enter instructions:");
+                string instruction = Console.ReadLine();
+
+                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                UserInputInstructions.Add(instruction);
+            }
+            return UserInputInstructions;
+        }
     }
 }

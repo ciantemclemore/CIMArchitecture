@@ -21,10 +21,13 @@ namespace CIMArchitecture
                     switch (selection)
                     {
                         case 1:
-                            IDE(factory.UserInputInstructions);
+                            var commands = factory.GatherUserInstructions();
+                            var compiler = new CIMCompiler(factory.CIMInstructions, commands);
                             break;
                         default: throw new Exception("Invalid selection");
                     }
+
+
                     selection = DisplayMenu();
 
                     if (selection == 4) 
@@ -47,23 +50,6 @@ namespace CIMArchitecture
             Console.WriteLine("4. Exit");
 
             return Int32.Parse(Console.ReadLine());
-        }
-
-        private static List<string> IDE(List<string> instructionContainer) 
-        {
-            string key = "run";
-            while (true) 
-            {
-                Console.WriteLine("Enter instructions:");
-                string instruction = Console.ReadLine();
-
-                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase)) 
-                {
-                    break;
-                }
-                instructionContainer.Add(instruction);
-            }
-            return instructionContainer;
         }
     }
 }

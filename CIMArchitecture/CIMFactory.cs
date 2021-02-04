@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 
 namespace CIMArchitecture
@@ -11,31 +10,79 @@ namespace CIMArchitecture
     /// </summary>
     class CIMFactory
     {
-        public List<Instruction> CIMInstructions { get; }
+        public Dictionary<string, Instruction> Instructions { get; set; }
 
-        public List<string> UserInputInstructions { get; set; } = new List<string>();
+        public Dictionary<string, Register> Registers { get; set; }
 
-        public CIMFactory() 
+        public List<string> UserInput { get; set; } = new List<string>();
+
+        private const string _instructionPath = "Database/InstructionDatabase.json";
+        private const string _registerPath = "Database/RegisterDatabase.json";
+
+        public CIMFactory()
         {
-            CIMInstructions = GetInstructionsFromJson();
+            var instructionJson = GetJsonData(_instructionPath);
+            var registerJson = GetJsonData(_registerPath);
+
+            Instructions = StoreInstructions(instructionJson);
+            Registers = StoreRegisters(registerJson);
         }
 
-        public List<Instruction> GetInstructionsFromJson() 
+        public string GetJsonData(string path)
         {
-            var instructions = new List<Instruction>();
+            string data = string.Empty;
+
             try
             {
-                using (StreamReader sr = new StreamReader("Database/InstructionDatabase.json"))
+                using (StreamReader sr = new StreamReader(path))
                 {
-                    instructions = JsonSerializer.Deserialize<List<Instruction>>(sr.ReadToEnd());
+                    data = sr.ReadToEnd();
                 }
             }
-            catch (IOException e) 
+            catch (IOException e)
             {
                 Console.WriteLine("The file could not be read: ");
                 Console.WriteLine(e.Message);
             }
-            return instructions;
+            return data;
+        }
+
+        public Dictionary<string, Instruction> StoreInstructions(string jsonString)
+        {
+            var instructions = JsonSerializer.Deserialize<List<Instruction>>(jsonString);
+            var instructionDictionary = new Dictionary<string, Instruction>();
+
+            if (instructions != null)
+            {
+                foreach (var instr in instructions)
+                {
+                    if (!Instructions.ContainsKey(instr.Name))
+                    {
+                        instructionDictionary.Add(instr.Name, instr);
+                    }
+                }
+            }
+
+            return instructionDictionary;
+        }
+
+        public Dictionary<string, Register> StoreRegisters(string jsonString)
+        {
+            var registers = JsonSerializer.Deserialize<List<Register>>(jsonString);
+            var registerDictionary = new Dictionary<string, Register>();
+
+            if (registers != null)
+            {
+                foreach (var reg in registers)
+                {
+                    if (!Registers.ContainsKey(reg.Name))
+                    {
+                        registerDictionary.Add(reg.Name, reg);
+                    }
+                }
+            }
+
+            return registerDictionary;
         }
 
         public List<string> GatherUserInstructions()
@@ -50,9 +97,9 @@ namespace CIMArchitecture
                 {
                     break;
                 }
-                UserInputInstructions.Add(instruction);
+                UserInput.Add(instruction);
             }
-            return UserInputInstructions;
+            return UserInput;
         }
     }
 }

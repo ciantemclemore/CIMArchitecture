@@ -5,31 +5,51 @@ namespace CIMArchitecture
 {
     class Program
     {
-        public static List<string> InstructionContainer = new List<string>();
         static void Main(string[] args)
         {
-            DisplayMenu();
-            
-            int selection = Int32.Parse(Console.ReadLine());
+            CIMFactory factory = new CIMFactory();
 
-            switch (selection) 
+            int userSelection = DisplayMenu();
+
+            if (userSelection != 4) 
             {
-                case 1:
-                    IDE(InstructionContainer);
-                    break;
-                default: throw new Exception("Invalid selection");
+                bool runProg = true;
+
+                while (runProg) 
+                {
+                    int selection = userSelection;
+                    switch (selection)
+                    {
+                        case 1:
+                            IDE(factory.UserInputInstructions);
+                            break;
+                        default: throw new Exception("Invalid selection");
+                    }
+                    selection = DisplayMenu();
+
+                    if (selection == 4) 
+                    {
+                        runProg = false;
+                    }
+                }
+            }
+
+            //Display user instructions if any: TEST
+            foreach (var instruction in factory.UserInputInstructions) 
+            {
+                Console.WriteLine($"{instruction}");
             }
         }
 
-        private static void DisplayMenu() 
+        private static int DisplayMenu() 
         {
             Console.WriteLine("1. IDE");
-            Console.WriteLine("2. Print Instructions");
-            Console.WriteLine("3. Print Registers");
             Console.WriteLine("4. Exit");
+
+            return Int32.Parse(Console.ReadLine());
         }
 
-        private static void IDE(List<string> container) 
+        private static List<string> IDE(List<string> instructionContainer) 
         {
             string key = "run";
             while (true) 
@@ -41,12 +61,9 @@ namespace CIMArchitecture
                 {
                     break;
                 }
-                container.Add(instruction);
+                instructionContainer.Add(instruction);
             }
-            foreach (var instruction in container) 
-            {
-                Console.WriteLine(instruction);
-            }
+            return instructionContainer;
         }
     }
 }

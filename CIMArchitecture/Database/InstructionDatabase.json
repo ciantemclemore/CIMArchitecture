@@ -1,0 +1,17 @@
+[
+  {
+    "name": "cAd",
+    "value": "00000000",
+    "function": "AddTwoRegisters"
+  },
+  {
+    "name": "cAdi",
+    "value": "00000000",
+    "function": "AddRegisterAndConstant"
+  },
+  {
+    "name": "cAd",
+    "value": "00000000",
+    "function": "AddTwoRegisters"
+  }
+]

@@ -5,14 +5,14 @@ using System.Text;
 namespace CIMArchitecture
 {
     /// <summary>
-    /// Defines the structure for an instruction
+    /// Defines the structure for a register.
     /// </summary>
-    class Instruction
+    class Register
     {
         public string Name { get; set; }
 
-        public string Value { get; set; }
+        public int DataValue { get; set; }
 
-        public string FunctionName { get; set; }
+        public string BitValue { get; set; }
     }
 }

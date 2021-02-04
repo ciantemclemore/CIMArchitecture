@@ -4,6 +4,9 @@ using System.Text;
 
 namespace CIMArchitecture
 {
+    /// <summary>
+    /// Defines the structure for a register.
+    /// </summary>
     class Register
     {
         public string Name { get; set; }

@@ -22,7 +22,7 @@ namespace CIMArchitecture
                     {
                         case 1:
                             var commands = factory.GatherUserInstructions();
-                            var compiler = new CIMCompiler(factory.CIMInstructions, commands);
+                            var compiler = new CIMCompiler(factory.Instructions, factory.Registers, commands);
                             break;
                         default: throw new Exception("Invalid selection");
                     }
@@ -38,7 +38,7 @@ namespace CIMArchitecture
             }
 
             //Display user instructions if any: TEST
-            foreach (var instruction in factory.UserInputInstructions) 
+            foreach (var instruction in factory.UserInput) 
             {
                 Console.WriteLine($"{instruction}");
             }

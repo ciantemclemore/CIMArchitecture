@@ -1,17 +1,17 @@
 [
   {
     "Name": "cAd",
-    "Value": 1,
+    "Value": "00000001",
     "FunctionName": "AddTwoRegisters"
   },
   {
     "Name": "cAdi",
-    "Value": 2,
+    "Value": "00000010",
     "FunctionName": "AddRegisterAndConstant"
   },
   {
-    "Name": "cAd",
-    "Value": 3,
-    "FunctionName": "AddTwoRegisters"
+    "Name": "cli",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
   }
 ]

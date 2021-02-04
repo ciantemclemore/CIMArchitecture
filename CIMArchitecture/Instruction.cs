@@ -4,9 +4,6 @@ using System.Text;
 
 namespace CIMArchitecture
 {
-    /// <summary>
-    /// Defines the structure for an instruction
-    /// </summary>
     class Instruction
     {
         public string Name { get; set; }

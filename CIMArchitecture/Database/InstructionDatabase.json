@@ -1,17 +1,17 @@
 [
   {
-    "Name": "cAd",
-    "Value": 1,
-    "FunctionName": "AddTwoRegisters"
+    "name": "cAd",
+    "value": "00000000",
+    "function": "AddTwoRegisters"
   },
   {
-    "Name": "cAdi",
-    "Value": 2,
-    "FunctionName": "AddRegisterAndConstant"
+    "name": "cAdi",
+    "value": "00000000",
+    "function": "AddRegisterAndConstant"
   },
   {
-    "Name": "cAd",
-    "Value": 3,
-    "FunctionName": "AddTwoRegisters"
+    "name": "cAd",
+    "value": "00000000",
+    "function": "AddTwoRegisters"
   }
 ]

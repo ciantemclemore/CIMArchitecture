@@ -10,11 +10,11 @@ namespace CIMArchitecture
     /// </summary>
     class CIMFactory
     {
-        public Dictionary<string, Instruction> Instructions { get; set; }
+        public Dictionary<string, Instruction> Instructions { get; }
 
-        public Dictionary<string, Register> Registers { get; set; }
+        public Dictionary<string, Register> Registers { get; }
 
-        public List<string> UserInput { get; set; } = new List<string>();
+        public List<string> UserInput { get; } = new List<string>();
 
         private const string _instructionPath = "Database/InstructionDatabase.json";
         private const string _registerPath = "Database/RegisterDatabase.json";
@@ -85,7 +85,7 @@ namespace CIMArchitecture
             return registerDictionary;
         }
 
-        public List<string> GatherUserInstructions()
+        public void GatherUserInstructionCommands()
         {
             string key = "run";
             while (true)
@@ -99,7 +99,25 @@ namespace CIMArchitecture
                 }
                 UserInput.Add(instruction);
             }
-            return UserInput;
+        }
+
+        private void LoadImmediate(string destination, string value)
+        {
+            //Get destination register
+            //var destReg = _availableRegisters[destination];
+
+            //int numValue;
+            //var IsNumber = Int32.TryParse(value, out numValue);
+
+            //if (numValue > 65536)
+            //{
+            //    //throw error
+            //}
+        }
+
+        private void AddTwoNumbers(Register destination, int first, int second)
+        {
+
         }
     }
 }

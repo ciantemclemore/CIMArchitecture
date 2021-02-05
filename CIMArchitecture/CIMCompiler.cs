@@ -11,36 +11,33 @@ namespace CIMArchitecture
     /// </summary>
     class CIMCompiler
     {
-        private Dictionary<string, Instruction> _availableInstructions;
-        private Dictionary<string, Register> _availableRegisters;
-        private List<string> _userInput;
+        private CIMFactory factory;
 
-        public CIMCompiler(Dictionary<string, Instruction> instructions, Dictionary<string, Register> registers, List<string> commands) 
+        public CIMCompiler(CIMFactory _factory) 
         {
-            _userInput = commands;
-            _availableInstructions = instructions;
-            ReadCommands(_userInput);
+            factory = _factory;
+            ReadCommands(factory.UserInput);
         }
 
         public void ReadCommands(List<string> userInput)
         {
-            var commands = SplitCommands(userInput);
+            var tokens = SplitCommandsIntoTokens(userInput);
 
-            ProcessCommands(commands);
+            ProcessCommands(tokens, factory);
         }
 
-        private void ProcessCommands(List<List<string>> commands)
+        private void ProcessCommands(List<List<string>> commands, CIMFactory _factory)
         {
             foreach (var command in commands)
             {
-                ProcessCommand(command);
+                ProcessCommand(command, _factory);
             }
         }
 
-        private void ProcessCommand(List<string> command) 
+        private void ProcessCommand(List<string> command, CIMFactory _factory) 
         {
             //Get instruction for method call
-            var instruction = _availableInstructions[command[0]];
+            var instruction = _factory.Instructions[command[0]];
 
             //Store the rest as parameters for the function call
             var parameters = new List<string>();
@@ -61,7 +58,7 @@ namespace CIMArchitecture
             }
         }
 
-        private List<List<string>> SplitCommands(List<string> commands) 
+        private List<List<string>> SplitCommandsIntoTokens(List<string> commands) 
         {
             List<List<string>> parsedCommands = new List<List<string>>();
 
@@ -70,26 +67,6 @@ namespace CIMArchitecture
                 parsedCommands.Add(cmd.Split(' ').ToList());
             }
             return parsedCommands;
-        }
-
-        
-        private void LoadImmediate(string destination, string value) 
-        {
-            //Get destination register
-            var destReg = _availableRegisters[destination];
-
-            int numValue;
-            var IsNumber = Int32.TryParse(value, out numValue);
-
-            if (numValue > 65536) 
-            {
-                //throw error
-            }
-        }
-
-        private void AddTwoNumbers(Register destination, int first, int second) 
-        {
-        
         }
 
 

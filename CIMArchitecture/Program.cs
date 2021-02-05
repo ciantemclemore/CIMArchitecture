@@ -21,8 +21,8 @@ namespace CIMArchitecture
                     switch (selection)
                     {
                         case 1:
-                            var commands = factory.GatherUserInstructions();
-                            var compiler = new CIMCompiler(factory.Instructions, factory.Registers, commands);
+                            factory.GatherUserInstructionCommands();
+                            var compiler = new CIMCompiler(factory);
                             break;
                         default: throw new Exception("Invalid selection");
                     }

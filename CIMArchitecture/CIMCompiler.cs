@@ -40,19 +40,22 @@ namespace CIMArchitecture
             var instruction = _factory.Instructions[command[0]];
 
             //Store the rest as parameters for the function call
-            var parameters = new List<string>();
+            var parameters = new object[command.Count - 1];
 
             //Get remaining parameters used
+            var j = 0;
             for (int i = 1; i < command.Count; i++) 
             {
-                parameters.Add(command[i]);
+                parameters[j] = command[i];
+                j++;
             }
 
             MethodInfo method = typeof(CIMFactory).GetMethod(instruction.FunctionName);
 
             if (method != null) 
             {
-                method.Invoke(_factory, new object[] { parameters });
+
+                method.Invoke(_factory, parameters);
             }
         }
 

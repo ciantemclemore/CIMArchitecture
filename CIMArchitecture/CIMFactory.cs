@@ -103,7 +103,7 @@ namespace CIMArchitecture
             }
         }
 
-        private void LoadImmediate(string source, string constant)
+        public void LoadImmediate(string source, string constant)
         {
             //Get destination register
             var destReg = Registers[source];

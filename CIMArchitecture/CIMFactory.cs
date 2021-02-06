@@ -10,14 +10,16 @@ namespace CIMArchitecture
     /// </summary>
     class CIMFactory
     {
-        public Dictionary<string, Instruction> Instructions { get; }
+        public Dictionary<string, Instruction> Instructions { get; } = new Dictionary<string, Instruction>();
 
-        public Dictionary<string, Register> Registers { get; }
+        public Dictionary<string, Register> Registers { get; } = new Dictionary<string, Register>();
 
         public List<string> UserInput { get; } = new List<string>();
 
         private const string _instructionPath = "Database/InstructionDatabase.json";
         private const string _registerPath = "Database/RegisterDatabase.json";
+        private const int _max16BitValue = 65536;
+        private const int _max8BitValue = 256;
 
         public CIMFactory()
         {
@@ -101,23 +103,59 @@ namespace CIMArchitecture
             }
         }
 
-        private void LoadImmediate(string destination, string value)
+        private void LoadImmediate(string source, string constant)
         {
             //Get destination register
-            //var destReg = _availableRegisters[destination];
+            var destReg = Registers[source];
 
-            //int numValue;
-            //var IsNumber = Int32.TryParse(value, out numValue);
+            if (destReg != null)
+            {
+                int _value;
+                Int32.TryParse(constant, out _value);
 
-            //if (numValue > 65536)
-            //{
-            //    //throw error
-            //}
+                if (IsValidValue(_value, _max16BitValue))
+                {
+                    destReg.DataValue = _value;
+                }
+            }
+            Console.WriteLine($"Registers used: \t{destReg.Name}");
+            Console.WriteLine($"Register value: \t{destReg.DataValue}");
+            Console.WriteLine($"Binary Instruction: \t{Instructions["cli"].Value}{Registers[source].BitValue}");
         }
 
         private void AddTwoNumbers(Register destination, int first, int second)
         {
 
         }
+
+        public Register ConvertToRegister(string source)
+        {
+            if (!string.IsNullOrEmpty(source))
+            {
+                if (Registers.ContainsKey(source))
+                {
+                    return Registers[source];
+                }                
+            }
+            throw new Exception("Source string is null or empty");            
+        }
+
+        public Instruction ConvertToInstruction(string source)
+        {
+            if (!string.IsNullOrEmpty(source))
+            {
+                if (Instructions.ContainsKey(source))
+                {
+                    return Instructions[source];
+                }
+            }
+            throw new Exception("Source string is null or empty");
+        }
+
+        private bool IsValidValue(int value, int limit)
+        {
+            return value <= limit;
+        }
+
     }
 }

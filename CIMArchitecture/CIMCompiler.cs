@@ -43,18 +43,16 @@ namespace CIMArchitecture
             var parameters = new List<string>();
 
             //Get remaining parameters used
-            int j = 0;
             for (int i = 1; i < command.Count; i++) 
             {
-                parameters[j] = command[i];
-                j++;
+                parameters.Add(command[i]);
             }
 
-            MethodInfo method = typeof(CIMCompiler).GetMethod(instruction.FunctionName);
+            MethodInfo method = typeof(CIMFactory).GetMethod(instruction.FunctionName);
 
             if (method != null) 
             {
-                method.Invoke(this, new object[] { parameters });
+                method.Invoke(_factory, new object[] { parameters });
             }
         }
 

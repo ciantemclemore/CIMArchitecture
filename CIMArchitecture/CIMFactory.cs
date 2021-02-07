@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace CIMArchitecture
 {
     /// <summary>
-    /// The CIMFactory is responsible for gathering and storing instruction data.
+    /// The CIMFactory is responsible for gathering, storing, and providing instruction data.
     /// </summary>
     class CIMFactory
     {
@@ -14,14 +14,13 @@ namespace CIMArchitecture
 
         public Dictionary<string, Register> Registers { get; } = new Dictionary<string, Register>();
 
-        public List<Register> UsedRegisters { get; set; } = new List<Register>();
+        private List<Register> UsedRegisters { get; set; } = new List<Register>();
 
-        public List<string> UserInput { get; } = new List<string>();
+        private List<Instruction> UsedInstructions { get; set; } = new List<Instruction>();
 
         private const string _instructionPath = "Database/InstructionDatabase.json";
         private const string _registerPath = "Database/RegisterDatabase.json";
-        private const int _max16BitValue = 65536;
-        private const int _max8BitValue = 256;
+        
 
         public CIMFactory()
         {
@@ -89,103 +88,63 @@ namespace CIMArchitecture
             return registerDictionary;
         }
 
-        public void GatherUserInstructionCommands()
-        {
-            string key = "run";
-
-            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
-            Console.WriteLine("Enter 'RUN' command once finished to compile");
-
-            while (true)
-            {
-                
-                string instruction = Console.ReadLine();
-
-                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
-                {
-                    break;
-                }
-                UserInput.Add(instruction);
-            }
-        }
-
-        public Register ConvertToRegister(string source)
-        {
-            if (!string.IsNullOrEmpty(source))
-            {
-                if (Registers.ContainsKey(source))
-                {
-                    return Registers[source];
-                }
-            }
-            throw new Exception("Source string is null or empty");
-        }
-
-        public Instruction ConvertToInstruction(string source)
-        {
-            if (!string.IsNullOrEmpty(source))
-            {
-                if (Instructions.ContainsKey(source))
-                {
-                    return Instructions[source];
-                }
-            }
-            throw new Exception("Source string is null or empty");
-        }
-
-        private bool IsValidValue(int value, int limit)
-        {
-            return value <= limit;
-        }
-
-        private void PrintResults(string instructionName, List<Register> registers)
+        public void PrintResults()
         {
             //Header
             Console.WriteLine("{0, -15} {1,-12} {2,-11} {3,-9}", "Instructions", "Registers", "Contents", "Binary");
 
-            foreach (var reg in registers)
+            //Now print table results
+            foreach (var instr in UsedInstructions)
             {
-                Console.WriteLine("{0,-15} {1,-12} {2,-11} {3,-9}", instructionName, reg.Name, reg.DataValue, reg.BitValue);
+                foreach (var reg in UsedRegisters)
+                {
+                    Console.WriteLine("{0,-15} {1,-12} {2,-11} {3,-9}", instr.Name, reg.Name, reg.DataValue, reg.BitValue);
+                }
             }
+
+            ClearData();
         }
 
+        private void ClearData()
+        {
+            UsedRegisters.Clear();
+            UsedInstructions.Clear();
+        }
 
         #region Instruction Methods
 
-        public void LoadImmediate(string source, string constant)
+        public void LoadImmediate(string instructionName, string source, string constant)
         {
-            //Get destination register
+            //Get destination register and instruction
             var destReg = Registers[source];
+            var instruction = Instructions[instructionName];
 
-            //Store used registers for printing results
-            UsedRegisters.Add(destReg);
+            //Store used registers and instruction for printing results
+            if (!UsedRegisters.Contains(destReg)) 
+            {
+                UsedRegisters.Add(destReg);
+            }
+            if (!UsedInstructions.Contains(instruction)) 
+            {
+                UsedInstructions.Add(instruction);
+            }
 
             if (destReg != null)
             {
                 int _value;
                 Int32.TryParse(constant, out _value);
 
-                if (IsValidValue(_value, _max16BitValue))
+                if (CIMCompiler.IsValidValue(_value, CIMCompiler._max16BitValue))
                 {
                     destReg.DataValue += _value;
                 }
             }
-
-            PrintResults("cli", UsedRegisters);
-
-            //Console.WriteLine($"Registers used: \t{destReg.Name}");
-            //Console.WriteLine($"Register value: \t{destReg.DataValue}");
-            //Console.WriteLine($"Binary Instruction: \t{Instructions["cli"].Value}{Registers[source].BitValue}");
         }
 
         private void AddTwoNumbers(Register destination, int first, int second)
         {
 
         }
-
         #endregion
-
-        
-
     }
 }

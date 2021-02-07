@@ -5,6 +5,8 @@ namespace CIMArchitecture
 {
     class Program
     {
+        private static List<string> UserInput = new List<string>();
+
         static void Main(string[] args)
         {
             CIMFactory factory = new CIMFactory();
@@ -21,8 +23,8 @@ namespace CIMArchitecture
                     switch (selection)
                     {
                         case 1:
-                            factory.GatherUserInstructionCommands();
-                            var compiler = new CIMCompiler(factory);
+                            GatherUserInstructionCommands();
+                            var compiler = new CIMCompiler(factory, UserInput);
                             break;
                         default: throw new Exception("Invalid selection");
                     }
@@ -34,13 +36,10 @@ namespace CIMArchitecture
                     {
                         runProg = false;
                     }
-                }
-            }
 
-            //Display user instructions if any: TEST
-            foreach (var instruction in factory.UserInput) 
-            {
-                Console.WriteLine($"{instruction}");
+                    //Before restarting, clean up
+                    UserInput.Clear();
+                }
             }
         }
 
@@ -50,6 +49,26 @@ namespace CIMArchitecture
             Console.WriteLine("4. Exit");
 
             return Int32.Parse(Console.ReadLine());
+        }
+
+        private static void GatherUserInstructionCommands()
+        {
+            string key = "run";
+
+            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
+            Console.WriteLine("Enter 'RUN' command once finished to compile");
+
+            while (true)
+            {
+
+                string instruction = Console.ReadLine();
+
+                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                UserInput.Add(instruction);
+            }
         }
     }
 }

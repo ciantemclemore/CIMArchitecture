@@ -1,13 +1,134 @@
 [
   {
-    "Name": "cAd",
+    "Name": "cad2",
     "Value": "00000001",
     "FunctionName": "AddTwoRegisters"
   },
   {
-    "Name": "cAdi",
+    "Name": "cad3",
+    "Value": "00000011",
+    "FunctionName": "AddThreeRegisters"
+  },
+  {
+    "Name": "cad2i",
     "Value": "00000010",
-    "FunctionName": "AddRegisterAndConstant"
+    "FunctionName": "AddImmediates"
+  },
+  {
+    "Name": "cad3i",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "csub2",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediates"
+  },
+  {
+    "Name": "csub3",
+    "Value": "00000011",
+    "FunctionName": "LoadRegister",
+    "Description": "Move a value of a register into another"
+  },
+  {
+    "Name": "csub2i",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "csub3i",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmulti2",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmulti3",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmulit2i",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmulit3i",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cdiv",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cdivi",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "csquare",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "csquarei",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "ccube",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "ccubei",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cpower",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cpoweri",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cpoweriall",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmod",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmodi",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cmodiall",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cfact",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
+  },
+  {
+    "Name": "cfacti",
+    "Value": "00000011",
+    "FunctionName": "LoadImmediate"
   },
   {
     "Name": "cli",

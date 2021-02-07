@@ -14,6 +14,8 @@ namespace CIMArchitecture
 
         public Dictionary<string, Register> Registers { get; } = new Dictionary<string, Register>();
 
+        public List<Register> UsedRegisters { get; set; } = new List<Register>();
+
         public List<string> UserInput { get; } = new List<string>();
 
         private const string _instructionPath = "Database/InstructionDatabase.json";
@@ -90,9 +92,13 @@ namespace CIMArchitecture
         public void GatherUserInstructionCommands()
         {
             string key = "run";
+
+            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
+            Console.WriteLine("Enter 'RUN' command once finished to compile");
+
             while (true)
             {
-                Console.WriteLine("Enter instructions:");
+                
                 string instruction = Console.ReadLine();
 
                 if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
@@ -103,31 +109,6 @@ namespace CIMArchitecture
             }
         }
 
-        public void LoadImmediate(string source, string constant)
-        {
-            //Get destination register
-            var destReg = Registers[source];
-
-            if (destReg != null)
-            {
-                int _value;
-                Int32.TryParse(constant, out _value);
-
-                if (IsValidValue(_value, _max16BitValue))
-                {
-                    destReg.DataValue = _value;
-                }
-            }
-            Console.WriteLine($"Registers used: \t{destReg.Name}");
-            Console.WriteLine($"Register value: \t{destReg.DataValue}");
-            Console.WriteLine($"Binary Instruction: \t{Instructions["cli"].Value}{Registers[source].BitValue}");
-        }
-
-        private void AddTwoNumbers(Register destination, int first, int second)
-        {
-
-        }
-
         public Register ConvertToRegister(string source)
         {
             if (!string.IsNullOrEmpty(source))
@@ -135,9 +116,9 @@ namespace CIMArchitecture
                 if (Registers.ContainsKey(source))
                 {
                     return Registers[source];
-                }                
+                }
             }
-            throw new Exception("Source string is null or empty");            
+            throw new Exception("Source string is null or empty");
         }
 
         public Instruction ConvertToInstruction(string source)
@@ -156,6 +137,55 @@ namespace CIMArchitecture
         {
             return value <= limit;
         }
+
+        private void PrintResults(string instructionName, List<Register> registers)
+        {
+            //Header
+            Console.WriteLine("{0, -15} {1,-12} {2,-11} {3,-9}", "Instructions", "Registers", "Contents", "Binary");
+
+            foreach (var reg in registers)
+            {
+                Console.WriteLine("{0,-15} {1,-12} {2,-11} {3,-9}", instructionName, reg.Name, reg.DataValue, reg.BitValue);
+            }
+        }
+
+
+        #region Instruction Methods
+
+        public void LoadImmediate(string source, string constant)
+        {
+            //Get destination register
+            var destReg = Registers[source];
+
+            //Store used registers for printing results
+            UsedRegisters.Add(destReg);
+
+            if (destReg != null)
+            {
+                int _value;
+                Int32.TryParse(constant, out _value);
+
+                if (IsValidValue(_value, _max16BitValue))
+                {
+                    destReg.DataValue += _value;
+                }
+            }
+
+            PrintResults("cli", UsedRegisters);
+
+            //Console.WriteLine($"Registers used: \t{destReg.Name}");
+            //Console.WriteLine($"Register value: \t{destReg.DataValue}");
+            //Console.WriteLine($"Binary Instruction: \t{Instructions["cli"].Value}{Registers[source].BitValue}");
+        }
+
+        private void AddTwoNumbers(Register destination, int first, int second)
+        {
+
+        }
+
+        #endregion
+
+        
 
     }
 }

@@ -13,5 +13,25 @@
     "Name": "c2",
     "DataValue": 0,
     "BitValue": "00000010"
+  },
+  {
+    "Name": "c3",
+    "DataValue": 0,
+    "BitValue": "00000011"
+  },
+  {
+    "Name": "c4",
+    "DataValue": 0,
+    "BitValue": "00000100"
+  },
+  {
+    "Name": "c5",
+    "DataValue": 0,
+    "BitValue": "00000101"
+  },
+  {
+    "Name": "c6",
+    "DataValue": 0,
+    "BitValue": "00000110"
   }
 ]

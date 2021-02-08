@@ -16,6 +16,8 @@ namespace CIMArchitecture
 
         public string FunctionName { get; set; }
 
+        public string Format { get; set; }
+
         public bool Equals([AllowNull] Instruction other)
         {
             if (other == null)

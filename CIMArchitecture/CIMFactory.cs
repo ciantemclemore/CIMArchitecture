@@ -14,9 +14,9 @@ namespace CIMArchitecture
 
         public Dictionary<string, Register> Registers { get; } = new Dictionary<string, Register>();
 
-        private List<Register> UsedRegisters { get; set; } = new List<Register>();
+        private Register CurrentRegister { get; set; } = new Register();
 
-        private List<Instruction> UsedInstructions { get; set; } = new List<Instruction>();
+        private Instruction CurrentInstruction { get; set; } = new Instruction();
 
         private const string _instructionPath = "Database/InstructionDatabase.json";
         private const string _registerPath = "Database/RegisterDatabase.json";
@@ -88,57 +88,44 @@ namespace CIMArchitecture
             return registerDictionary;
         }
 
-        public void PrintResults()
+        public void PrintResults(string binarayInstruction)
         {
             //Header
-            Console.WriteLine("{0, -15} {1,-12} {2,-11} {3,-9}", "Instructions", "Registers", "Contents", "Binary");
-
-            //Now print table results
-            foreach (var instr in UsedInstructions)
-            {
-                foreach (var reg in UsedRegisters)
-                {
-                    Console.WriteLine("{0,-15} {1,-12} {2,-11} {3,-9}", instr.Name, reg.Name, reg.DataValue, reg.BitValue);
-                }
-            }
+            Console.WriteLine("{0, -11} {1,-7} {2,-12} {3,-11} {4,-9}", "OPCODE", "Name", "Registers", "Contents", "Binary");
+            
+            //Fix the spacing... opcodes are 8 characters so need to compensate
+            Console.WriteLine("{0,-} {1,-12} {2,-11} {3,-9}", CurrentInstruction.Value, CurrentInstruction.Name, 
+                CurrentRegister.Name, CurrentRegister.DataValue, binarayInstruction);
 
             ClearData();
         }
 
         private void ClearData()
         {
-            UsedRegisters.Clear();
-            UsedInstructions.Clear();
+            CurrentInstruction = null;
+            CurrentRegister = null;
         }
 
         #region Instruction Methods
 
-        public void LoadImmediate(string instructionName, string source, string constant)
+        public string LoadImmediate(string instructionName, string source, string constant)
         {
             //Get destination register and instruction
-            var destReg = Registers[source];
-            var instruction = Instructions[instructionName];
+            CurrentRegister = Registers[source];
+            CurrentInstruction = Instructions[instructionName];
 
-            //Store used registers and instruction for printing results
-            if (!UsedRegisters.Contains(destReg)) 
-            {
-                UsedRegisters.Add(destReg);
-            }
-            if (!UsedInstructions.Contains(instruction)) 
-            {
-                UsedInstructions.Add(instruction);
-            }
-
-            if (destReg != null)
+            if (CurrentRegister != null && CurrentInstruction != null)
             {
                 int _value;
                 Int32.TryParse(constant, out _value);
 
                 if (CIMCompiler.IsValidValue(_value, CIMCompiler._max16BitValue))
                 {
-                    destReg.DataValue += _value;
+                    CurrentRegister.DataValue += _value;
                 }
             }
+            //Fix the ToBinary Method
+            return $"{CurrentRegister.DataValue.ToBinary(16)}{CurrentRegister.BitValue}{CurrentInstruction.Value}";
         }
 
         private void AddTwoNumbers(Register destination, int first, int second)

@@ -11,41 +11,40 @@ namespace CIMArchitecture
     /// </summary>
     class CIMCompiler
     {
-        private CIMFactory factory;
-        private List<string> commands = new List<string>();
+        private readonly CIMFactory _cimFactory;
+        private readonly List<string> _commands = new List<string>();
         public const int _max16BitValue = 65536;
         public const int _max8BitValue = 256;
 
-        public CIMCompiler(CIMFactory _factory, List<string> _commands) 
+        public CIMCompiler(CIMFactory factory, List<string> commands) 
         {
-            factory = _factory;
-            commands = _commands;
-            ExecuteCommands(commands);
+            _cimFactory = factory;
+            _commands = commands;
+            ExecuteCommands(_commands, _cimFactory);
         }
 
-        public void ExecuteCommands(List<string> commands)
+        public void ExecuteCommands(List<string> userCommands, CIMFactory factory)
         {
-            var tokens = SplitCommandsIntoTokens(commands);
+            var tokens = SplitCommandsIntoTokens(userCommands);
 
             ProcessCommands(tokens, factory);
-
-            factory.PrintResults();
 
             ClearData();
         }
 
-        private void ProcessCommands(List<List<string>> commands, CIMFactory _factory)
+        private void ProcessCommands(List<List<string>> commands, CIMFactory factory)
         {
             foreach (var command in commands)
             {
-                ProcessCommand(command, _factory);
+                var instruction = ProcessCommand(command, factory);
+                factory.PrintResults(instruction);
             }
         }
 
-        private void ProcessCommand(List<string> command, CIMFactory _factory) 
+        private string ProcessCommand(List<string> command, CIMFactory factory) 
         {
             //Get instruction for method call
-            var instruction = _factory.Instructions[command[0]];
+            var instruction = factory.Instructions[command[0]];
 
             //Store the rest as parameters for the function call
             var parameters = new object[command.Count];
@@ -60,11 +59,15 @@ namespace CIMArchitecture
             //Get the method from the CIMFactory
             MethodInfo method = typeof(CIMFactory).GetMethod(instruction.FunctionName);
 
+            //we want to get the full binary instruction from the method
+            string binaryInstruction = null;
+
             if (method != null) 
             {
                 //Call the method in the factory and provide its parameters
-                method.Invoke(_factory, parameters);
+                binaryInstruction = (string)method.Invoke(factory, parameters);
             }
+            return binaryInstruction;
         }
 
         private List<List<string>> SplitCommandsIntoTokens(List<string> commands) 
@@ -80,7 +83,7 @@ namespace CIMArchitecture
 
         private void ClearData() 
         {
-            commands.Clear();
+            _commands.Clear();
         }
 
         public static bool IsValidValue(int value, int limit)
@@ -92,9 +95,9 @@ namespace CIMArchitecture
         {
             if (!string.IsNullOrEmpty(source))
             {
-                if (factory.Registers.ContainsKey(source))
+                if (_cimFactory.Registers.ContainsKey(source))
                 {
-                    return factory.Registers[source];
+                    return _cimFactory.Registers[source];
                 }
             }
             throw new Exception("Source string is null or empty");
@@ -104,9 +107,9 @@ namespace CIMArchitecture
         {
             if (!string.IsNullOrEmpty(source))
             {
-                if (factory.Instructions.ContainsKey(source))
+                if (_cimFactory.Instructions.ContainsKey(source))
                 {
-                    return factory.Instructions[source];
+                    return _cimFactory.Instructions[source];
                 }
             }
             throw new Exception("Source string is null or empty");

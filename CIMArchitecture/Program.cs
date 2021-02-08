@@ -13,18 +13,18 @@ namespace CIMArchitecture
 
             int userSelection = DisplayMenu();
 
-            if (userSelection != 4) 
+            if (userSelection != 4)
             {
                 bool runProg = true;
 
-                while (runProg) 
+                while (runProg)
                 {
                     int selection = userSelection;
                     switch (selection)
                     {
                         case 1:
                             GatherUserInstructionCommands();
-                            var compiler = new CIMCompiler(factory, UserInput);
+                            new CIMCompiler(factory, UserInput);
                             break;
                         default: throw new Exception("Invalid selection");
                     }
@@ -32,7 +32,7 @@ namespace CIMArchitecture
 
                     selection = DisplayMenu();
 
-                    if (selection == 4) 
+                    if (selection == 4)
                     {
                         runProg = false;
                     }

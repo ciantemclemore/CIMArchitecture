@@ -2,137 +2,302 @@
   {
     "Name": "cad2",
     "Value": "00000001",
-    "FunctionName": "AddTwoRegisters"
-  },
-  {
-    "Name": "cad3",
-    "Value": "00000011",
-    "FunctionName": "AddThreeRegisters"
+    "FunctionName": "Add",
+    "Format": "C"
   },
   {
     "Name": "cad2i",
     "Value": "00000010",
-    "FunctionName": "AddImmediates"
-  },
-  {
-    "Name": "cad3i",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "FunctionName": "AddImmediate",
+    "Format": "C"
   },
   {
     "Name": "csub2",
     "Value": "00000011",
-    "FunctionName": "LoadImmediates"
-  },
-  {
-    "Name": "csub3",
-    "Value": "00000011",
-    "FunctionName": "LoadRegister",
-    "Description": "Move a value of a register into another"
+    "FunctionName": "Subtract",
+    "Format": "C"
   },
   {
     "Name": "csub2i",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
-  },
-  {
-    "Name": "csub3i",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00000100",
+    "FunctionName": "SubtractImmediate",
+    "Format": "C"
   },
   {
     "Name": "cmulti2",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
-  },
-  {
-    "Name": "cmulti3",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00000101",
+    "FunctionName": "Multiply",
+    "Format": "C"
   },
   {
     "Name": "cmulit2i",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
-  },
-  {
-    "Name": "cmulit3i",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00000110",
+    "FunctionName": "MultiplyImmediate",
+    "Format": "C"
   },
   {
     "Name": "cdiv",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00000111",
+    "FunctionName": "Divide",
+    "Format": "C"
   },
   {
     "Name": "cdivi",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001000",
+    "FunctionName": "DivideImmediate",
+    "Format": "C"
   },
   {
     "Name": "csquare",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001001",
+    "FunctionName": "Square",
+    "Format": "M"
   },
   {
     "Name": "csquarei",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001010",
+    "FunctionName": "SquareImmediate",
+    "Format": "M"
   },
   {
     "Name": "ccube",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001011",
+    "FunctionName": "Cube",
+    "Format": "M"
   },
   {
     "Name": "ccubei",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001100",
+    "FunctionName": "CubeImmediate",
+    "Format": "M"
   },
   {
     "Name": "cpower",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001101",
+    "FunctionName": "Power",
+    "Format": "C"
   },
   {
     "Name": "cpoweri",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001110",
+    "FunctionName": "PowerImmediate",
+    "Format": "C"
   },
   {
     "Name": "cpoweriall",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00001111",
+    "FunctionName": "PowerImmediateAll",
+    "Format": "C"
   },
   {
     "Name": "cmod",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00010000",
+    "FunctionName": "Modulo",
+    "Format": "C"
   },
   {
     "Name": "cmodi",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00010001",
+    "FunctionName": "ModuloImmediate",
+    "Format": "C"
   },
   {
     "Name": "cmodiall",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00010010",
+    "FunctionName": "ModuloImmediateAll",
+    "Format": "C"
   },
   {
     "Name": "cfact",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00010011",
+    "FunctionName": "Factorial",
+    "Format": "M"
   },
   {
     "Name": "cfacti",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00010100",
+    "FunctionName": "FactorialImmediate",
+    "Format": "M"
+  },
+  {
+    "Name": "ccomp",
+    "Value": "00010101",
+    "FunctionName": "Complement",
+    "Format": "M"
+  },
+  {
+    "Name": "ccompi",
+    "Value": "00010110",
+    "FunctionName": "ComplementImmediate",
+    "Format": "M"
+  },
+  {
+    "Name": "csll",
+    "Value": "00010111",
+    "FunctionName": "ShiftLeft",
+    "Format": "C"
+  },
+  {
+    "Name": "cslli",
+    "Value": "00011000",
+    "FunctionName": "ShiftLeftImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "csrl",
+    "Value": "00011001",
+    "FunctionName": "ShiftRight",
+    "Format": "C"
+  },
+  {
+    "Name": "csrli",
+    "Value": "00011010",
+    "FunctionName": "ShiftRightImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cand",
+    "Value": "00011011",
+    "FunctionName": "BitwiseAND",
+    "Format": "C"
+  },
+  {
+    "Name": "candi",
+    "Value": "00011100",
+    "FunctionName": "BitwiseANDImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cor",
+    "Value": "00011101",
+    "FunctionName": "BitwiseOR",
+    "Format": "C"
+  },
+  {
+    "Name": "cori",
+    "Value": "00011110",
+    "FunctionName": "BitwiseORImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cxor",
+    "Value": "00011111",
+    "FunctionName": "BitwiseExclusiveOR",
+    "Format": "C"
+  },
+  {
+    "Name": "cxori",
+    "Value": "00100000",
+    "FunctionName": "BitwiseExclusiveORImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cless",
+    "Value": "00100001",
+    "FunctionName": "LessThan",
+    "Format": "C"
+  },
+  {
+    "Name": "clessi",
+    "Value": "00100010",
+    "FunctionName": "LessThanImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cgreat",
+    "Value": "00100011",
+    "FunctionName": "GreaterThan",
+    "Format": "C"
+  },
+  {
+    "Name": "cgreati",
+    "Value": "00100100",
+    "FunctionName": "GreaterThanImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cequal",
+    "Value": "00100101",
+    "FunctionName": "IsEqual",
+    "Format": "C"
+  },
+  {
+    "Name": "cequali",
+    "Value": "00100110",
+    "FunctionName": "IsEqualImmediate",
+    "Format": "C"
+  },
+  {
+    "Name": "cnequal",
+    "Value": "00100111",
+    "FunctionName": "NotEqual",
+    "Format": "C"
+  },
+  {
+    "Name": "cnequali",
+    "Value": "00101000",
+    "FunctionName": "NotEqualImmediate",
+    "Format": "C"
   },
   {
     "Name": "cli",
-    "Value": "00000011",
-    "FunctionName": "LoadImmediate"
+    "Value": "00101001",
+    "FunctionName": "LoadImmediate",
+    "Format": "M"
+  },
+  {
+    "Name": "cmove",
+    "Value": "00101010",
+    "FunctionName": "Move",
+    "Format": "M"
+  },
+  {
+    "Name": "cswap",
+    "Value": "00101011",
+    "FunctionName": "Swap",
+    "Format": "M"
+  },
+  {
+    "Name": "cdelete1",
+    "Value": "00101100",
+    "FunctionName": "Delete",
+    "Format": "I"
+  },
+  {
+    "Name": "cdeleteall",
+    "Value": "00101101",
+    "FunctionName": "DeleteAll",
+    "Format": "I"
+  },
+  {
+    "Name": "ccreate",
+    "Value": "00101110",
+    "FunctionName": "CreateMemory",
+    "Format": "I"
+  },
+  {
+    "Name": "cmemcopy",
+    "Value": "00101111",
+    "FunctionName": "MemoryCopy",
+    "Format": "I"
+  },
+  {
+    "Name": "cstore",
+    "Value": "00110000",
+    "FunctionName": "StoreInMemory",
+    "Format": "I"
+  },
+  {
+    "Name": "cload",
+    "Value": "00110001",
+    "FunctionName": "LoadFromMemory",
+    "Format": "I"
+  },
+  {
+    "Name": "cclear",
+    "Value": "00110010",
+    "FunctionName": "ClearMemory",
+    "Format": "I"
   }
+
 ]

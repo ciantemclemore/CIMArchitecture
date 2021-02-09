@@ -13,91 +13,65 @@ namespace CIMArchitecture
     {
         private readonly Configuration _configuration;
 
-        private readonly List<string> _userCommands = new List<string>();
+        private List<string> _commands { get; set; } = new List<string>();
 
-        private List<Instruction> UsedInstructions { get; set; } = new List<Instruction>();
+        private Dictionary<string, Instruction> _resultData = new Dictionary<string, Instruction>();
 
-        private List<string> FullBinaryInstruction { get; set; } = new List<string>();
+        private const int _max16BitValue = 65536;
 
-        public const int _max16BitValue = 65536;
-
-        public const int _max8BitValue = 256;
+        private const int _max8BitValue = 256;
 
         public CIMCompiler(Configuration config) 
         {
             _configuration = config;
-            _userCommands = GatherUserInstructionCommands(config);
-            ExecuteCommands(_userCommands, config);
         }
 
-        private List<string> GatherUserInstructionCommands(Configuration config)
+
+
+        public Dictionary<string, Instruction> ExecuteCommands()
         {
-            string key = "run";
-            var userInput = new List<string>();
+            var tokens = SplitCommandsIntoTokens(_commands);
 
-            Console.WriteLine();
-            PrintState(config);
-            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
-            Console.WriteLine("Enter 'RUN' command once finished to compile");
+            ProcessCommands(tokens);
 
-
-            while (true)
-            {
-
-                string instruction = Console.ReadLine();
-
-                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
-                {
-                    break;
-                }
-                userInput.Add(instruction);
-            }
-            return userInput;
+            var results = new Dictionary<string, Instruction>(_resultData);
+            
+            ClearData();
+            
+            return results;
         }
 
-        public void ExecuteCommands(List<string> userCommands, Configuration config)
-        {
-            var tokens = SplitCommandsIntoTokens(userCommands);
-
-            ProcessCommands(tokens, config);
-            PrintState(config);
-            PrintResults();
-        }
-
-        private void ProcessCommands(List<List<string>> tokenLists, Configuration factory)
+        private void ProcessCommands(List<List<string>> tokenLists)
         {
             foreach (var tokenList in tokenLists)
             {
-                ProcessCommand(tokenList, factory);
+                ProcessCommand(tokenList);
             }
         }
 
-        private void ProcessCommand(List<string> tokenList, Configuration config) 
+        private void ProcessCommand(List<string> tokenList) 
         {
             //Get instruction for method call
-            var instruction = config.Instructions[tokenList[0]];
-            
-            //Needs to check if valid instruction
-            UsedInstructions.Add(instruction);
+            var instruction = _configuration.Instructions[tokenList[0]];
 
             //Store the rest as parameters for the function call
             var parameters = new object[tokenList.Count];
-            parameters[0] = instruction.Name;
 
             //Get remaining parameters used
-            for (int i = 1; i < tokenList.Count; i++) 
+            for (int i = 0; i < tokenList.Count; i++) 
             {
                 parameters[i] = tokenList[i];
             }
 
             //Get the method from the CIMFactory
-            MethodInfo method = typeof(CIMCompiler).GetMethod(instruction.FunctionName);
+            MethodInfo method = typeof(CIMCompiler).GetMethod(instruction.FunctionName, BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (method != null) 
             {
                 //Call the method in the factory and provide its parameters
                 var binaryInstruction = (string)method.Invoke(this, parameters);
-                FullBinaryInstruction.Add(binaryInstruction);
+
+                _resultData.Add(binaryInstruction, instruction);
             }
         }
 
@@ -112,104 +86,187 @@ namespace CIMArchitecture
             return parsedCommands;
         }
 
-        private List<Register> ParseRegisters(List<string> tokens) 
+        private List<string> SplitCommandsIntoTokens(string command)
         {
-            var regList = new List<Register>();
+            return command.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        }
 
-            foreach (var register in tokens) 
+        public bool IsValidCommand(string command) 
+        {
+            var tokens = SplitCommandsIntoTokens(command);
+
+            //Check the instruction first before going over parameters
+            var instruction = tokens[0].ToInstruction(_configuration);
+
+            //If its not a valid instruction, its not a valid command
+            if (instruction == null) return false;
+
+            //Check to see which format the command falls under, and check for validity
+            if (instruction.Format.Equals("C")) return IsValidCFormat(tokens);
+            else if (instruction.Format.Equals("I")) return IsValidIFormat(tokens);
+            else return IsValidMFormat(tokens);
+        }
+
+        private bool IsValidCFormat(List<string> parameters) 
+       {
+            //C-Formats have immediate versions as well. Check to see if
+            //the user has provided the right arguments based on instruction name
+            var instruction = parameters[0].ToInstruction(_configuration);
+            var lastParameter = parameters[parameters.Count - 1].ToRegister(_configuration);
+
+            if (!instruction.Name.EndsWith('i') && lastParameter == null) return false;
+            if (instruction.Name.EndsWith('i') && lastParameter != null) return false;
+
+            for (int i = 1; i < parameters.Count ; i++) 
             {
-                if (register.StartsWith('c')) 
+                var parameter = parameters[i].ToRegister(_configuration);
+
+                if (i == parameters.Count - 1 && parameter == null) 
                 {
-                    regList.Add(ConvertToRegister(register));
+                    return (IsValidValue(Int32.Parse(parameters[i]), _max8BitValue));
                 }
+
+                if (parameter == null) return false;
             }
-            return regList;
+            return true;
         }
 
-        public void PrintState(Configuration config) 
+        private bool IsValidIFormat(List<string> parameters)
         {
-            Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,14}", "CIM State");
-            Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", "Registers", "Value");
-            foreach (var kvp in config.Registers) 
+            //Odd case, couldn't think of a convention to check for these two single instructions
+            const string x = "cdeleteall";
+            const string y = "cclear";
+
+            if (parameters[0].Equals(x) && parameters.Count > 1 || parameters[0].Equals(y) && parameters.Count > 1)
             {
-                Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", kvp.Value.Name, kvp.Value.DataValue);
+                return false;
             }
+
+            if (parameters.Count > 1 && parameters[1].ToRegister(_configuration) == null)
+            {
+                return IsValidValue(Int32.Parse(parameters[1]), _max16BitValue);
+            }
+            return true;
         }
-        public void PrintResults()
+
+        private bool IsValidMFormat(List<string> parameters)
         {
-            Console.WriteLine();
+            var destinationRegister = parameters[1].ToRegister(_configuration);
+            var secondParameter = parameters[2].ToRegister(_configuration);
 
-            //Header
-            Console.WriteLine("{0, -14} {1,-16} {2,-18}", "Name", "OPCODE", "32-Bit Instruction");
+            //Here we check to see if the first parameter is a valid register
+            //If first parameter is valid, we check to see if the second parameter is valid
+            //Second parameter must be a valid immediate value or register
+            if (destinationRegister == null) return false;
 
-            int i = 0;
-            foreach (var instr in UsedInstructions) 
+            if (secondParameter == null)
             {
-                //Fix the spacing... opcodes are 8 characters so need to compensate
-                Console.WriteLine("{0,-14} {1,-16} {2,-18}", instr.Name, instr.Value, FullBinaryInstruction[i]);
-                i++;
-
+                return IsValidValue(Int32.Parse(parameters[2]), _max16BitValue);
             }
-            ClearData();
-            Console.WriteLine();
+            return true;
+        }
+
+        public void QueueCommand(string command)  
+        {
+            _commands.Add(command);
         }
 
         private void ClearData() 
         {
-            _userCommands.Clear();
-            UsedInstructions.Clear();
-            FullBinaryInstruction.Clear();
+            _commands.Clear();
+            _resultData.Clear();
         }
 
-        public static bool IsValidValue(int value, int limit)
+        private bool IsValidValue(int value, int limit)
         {
             return value <= limit;
         }
 
-        public Register ConvertToRegister(string source)
+        #region C-Format Instruction Methods
+        private string Add(string instructionName, string source, string first, string second) 
         {
-            if (!string.IsNullOrEmpty(source))
-            {
-                if (_configuration.Registers.ContainsKey(source))
-                {
-                    return _configuration.Registers[source];
-                }
-            }
-            throw new Exception("Source string is null or empty");
-        }
-
-        public Instruction ConvertToInstruction(string source)
-        {
-            if (!string.IsNullOrEmpty(source))
-            {
-                if (_configuration.Instructions.ContainsKey(source))
-                {
-                    return _configuration.Instructions[source];
-                }
-            }
-            throw new Exception("Source string is null or empty");
-        }
-
-        #region Instruction Methods
-        public string LoadImmediate(string instructionName, string source, string constant)
-        {
-            //Get destination register and instruction
-            var destReg = _configuration.Registers[source];
             var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var secondReg = _configuration.Registers[second];
+            destReg.DataValue = (firstReg.DataValue + secondReg.DataValue);
 
-            if (destReg != null && instruction != null)
-            {
-                int _value;
-                Int32.TryParse(constant, out _value);
+            return $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
 
-                if (CIMCompiler.IsValidValue(_value, CIMCompiler._max16BitValue))
-                {
-                    destReg.DataValue += _value;
-                }
-            }
-            return $"{destReg.DataValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        private string AddImmediate(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var immediate = Int32.Parse(second);
+            destReg.DataValue = immediate;
+
+            return $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string Subtract(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var secondReg = _configuration.Registers[second];
+            destReg.DataValue = (firstReg.DataValue - secondReg.DataValue);
+
+            return $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string SubtractImmediate(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var immediate = Int32.Parse(second);
+            destReg.DataValue = (firstReg.DataValue - immediate);
+
+            return $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
         }
         #endregion
 
+        #region I-Format Instruction Methods
+        private string DeleteAll(string instructionName) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+
+            //Delete all values out of registers
+            foreach (var reg in _configuration.Registers) 
+            {
+                reg.Value.DataValue = 0;
+            }
+            return $"{0.ToBinary(24)}{instruction.Value.ToBinary(8)}";
+        }
+        #endregion
+
+        #region M-Format Instruction Methods
+        private string LoadImmediate(string instructionName, string source, string first)
+        {
+            //Get destination register and instruction
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+
+            //determine if 'first' is a register or immediate
+            Register _firstReg = first.ToRegister(_configuration);
+            string binString = string.Empty;
+
+            //If it is not a register, it is an immediate value
+            if (_firstReg == null)
+            {
+                var value = Int32.Parse(first);
+                destReg.DataValue = value;
+                binString = value.ToBinary(16);
+            }
+            else
+            {
+                destReg.DataValue = _firstReg.DataValue;
+                binString = _firstReg.BitValue.ToBinary(16);
+            }
+            return $"{binString}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+        #endregion
     }
 }

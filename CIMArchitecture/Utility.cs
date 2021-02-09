@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CIMArchitecture.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,6 +19,30 @@ namespace CIMArchitecture
                 binaryString = storage[length - 1 - i].ToString() + binaryString;
             }
             return binaryString;
+        }
+
+        public static Register ToRegister(this string source, Configuration _configuration)
+        {
+            if (!string.IsNullOrEmpty(source))
+            {
+                if (_configuration.Registers.ContainsKey(source))
+                {
+                    return _configuration.Registers[source];
+                }
+            }
+            return null;
+        }
+
+        public static Instruction ToInstruction(this string source, Configuration _configuration)
+        {
+            if (!string.IsNullOrEmpty(source))
+            {
+                if (_configuration.Instructions.ContainsKey(source))
+                {
+                    return _configuration.Instructions[source];
+                }
+            }
+            return null;
         }
     }
 }

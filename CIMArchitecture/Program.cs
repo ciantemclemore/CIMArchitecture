@@ -23,7 +23,7 @@ namespace CIMArchitecture
                     switch (selection)
                     {
                         case 1:
-                            GatherUserInstructionCommands();
+                            GatherUserInstructionCommands(factory);
                             new CIMCompiler(factory, UserInput);
                             break;
                         default: throw new Exception("Invalid selection");
@@ -47,16 +47,17 @@ namespace CIMArchitecture
         {
             Console.WriteLine("1. IDE");
             Console.WriteLine("4. Exit");
-
             return Int32.Parse(Console.ReadLine());
         }
 
-        private static void GatherUserInstructionCommands()
+        private static void GatherUserInstructionCommands(CIMFactory factory)
         {
             string key = "run";
-
+            Console.WriteLine();
+            CIMCompiler.PrintState(factory);
             Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
             Console.WriteLine("Enter 'RUN' command once finished to compile");
+
 
             while (true)
             {

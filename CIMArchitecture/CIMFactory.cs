@@ -14,11 +14,8 @@ namespace CIMArchitecture
 
         public Dictionary<string, Register> Registers { get; } = new Dictionary<string, Register>();
 
-        private Register CurrentRegister { get; set; } = new Register();
-
-        private Instruction CurrentInstruction { get; set; } = new Instruction();
-
         private const string _instructionPath = "Database/InstructionDatabase.json";
+
         private const string _registerPath = "Database/RegisterDatabase.json";
         
 
@@ -88,22 +85,11 @@ namespace CIMArchitecture
             return registerDictionary;
         }
 
-        public void PrintResults(string binarayInstruction)
-        {
-            //Header
-            Console.WriteLine("{0, -11} {1,-7} {2,-12} {3,-11} {4,-9}", "OPCODE", "Name", "Registers", "Contents", "Binary");
-            
-            //Fix the spacing... opcodes are 8 characters so need to compensate
-            Console.WriteLine("{0,-} {1,-12} {2,-11} {3,-9}", CurrentInstruction.Value, CurrentInstruction.Name, 
-                CurrentRegister.Name, CurrentRegister.DataValue, binarayInstruction);
-
-            ClearData();
-        }
+       
 
         private void ClearData()
         {
-            CurrentInstruction = null;
-            CurrentRegister = null;
+            
         }
 
         #region Instruction Methods
@@ -111,21 +97,20 @@ namespace CIMArchitecture
         public string LoadImmediate(string instructionName, string source, string constant)
         {
             //Get destination register and instruction
-            CurrentRegister = Registers[source];
-            CurrentInstruction = Instructions[instructionName];
+            var destReg = Registers[source];
+            var instruction = Instructions[instructionName];
 
-            if (CurrentRegister != null && CurrentInstruction != null)
+            if (destReg != null && instruction != null)
             {
                 int _value;
                 Int32.TryParse(constant, out _value);
 
                 if (CIMCompiler.IsValidValue(_value, CIMCompiler._max16BitValue))
                 {
-                    CurrentRegister.DataValue += _value;
+                    destReg.DataValue += _value;
                 }
             }
-            //Fix the ToBinary Method
-            return $"{CurrentRegister.DataValue.ToBinary(16)}{CurrentRegister.BitValue}{CurrentInstruction.Value}";
+            return $"{destReg.DataValue.ToBinary(16)}{destReg.BitValue}{instruction.Value}";
         }
 
         private void AddTwoNumbers(Register destination, int first, int second)

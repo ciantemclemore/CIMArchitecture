@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CIMArchitecture.Models;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Reflection;
 
@@ -11,11 +11,9 @@ namespace CIMArchitecture
     /// </summary>
     class CIMCompiler
     {
-        private readonly CIMFactory _cimFactory;
+        private readonly Configuration _configuration;
 
-        private readonly List<string> _commands = new List<string>();
-
-        private List<Register> UsedRegisters { get; set; } = new List<Register>();
+        private readonly List<string> _userCommands = new List<string>();
 
         private List<Instruction> UsedInstructions { get; set; } = new List<Instruction>();
 
@@ -25,25 +23,48 @@ namespace CIMArchitecture
 
         public const int _max8BitValue = 256;
 
-        public CIMCompiler(CIMFactory factory, List<string> commands) 
+        public CIMCompiler(Configuration config) 
         {
-            _cimFactory = factory;
-            _commands = commands;
-            ExecuteCommands(_commands, _cimFactory);
+            _configuration = config;
+            _userCommands = GatherUserInstructionCommands(config);
+            ExecuteCommands(_userCommands, config);
         }
 
-        public void ExecuteCommands(List<string> userCommands, CIMFactory factory)
+        private List<string> GatherUserInstructionCommands(Configuration config)
+        {
+            string key = "run";
+            var userInput = new List<string>();
+
+            Console.WriteLine();
+            PrintState(config);
+            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
+            Console.WriteLine("Enter 'RUN' command once finished to compile");
+
+
+            while (true)
+            {
+
+                string instruction = Console.ReadLine();
+
+                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                userInput.Add(instruction);
+            }
+            return userInput;
+        }
+
+        public void ExecuteCommands(List<string> userCommands, Configuration config)
         {
             var tokens = SplitCommandsIntoTokens(userCommands);
 
-            ProcessCommands(tokens, factory);
-            PrintState(factory);
+            ProcessCommands(tokens, config);
+            PrintState(config);
             PrintResults();
-
-            ClearData();
         }
 
-        private void ProcessCommands(List<List<string>> tokenLists, CIMFactory factory)
+        private void ProcessCommands(List<List<string>> tokenLists, Configuration factory)
         {
             foreach (var tokenList in tokenLists)
             {
@@ -51,10 +72,10 @@ namespace CIMArchitecture
             }
         }
 
-        private void ProcessCommand(List<string> tokenList, CIMFactory factory) 
+        private void ProcessCommand(List<string> tokenList, Configuration config) 
         {
             //Get instruction for method call
-            var instruction = factory.Instructions[tokenList[0]];
+            var instruction = config.Instructions[tokenList[0]];
             
             //Needs to check if valid instruction
             UsedInstructions.Add(instruction);
@@ -70,12 +91,13 @@ namespace CIMArchitecture
             }
 
             //Get the method from the CIMFactory
-            MethodInfo method = typeof(CIMFactory).GetMethod(instruction.FunctionName);
+            MethodInfo method = typeof(CIMCompiler).GetMethod(instruction.FunctionName);
 
             if (method != null) 
             {
                 //Call the method in the factory and provide its parameters
-                FullBinaryInstruction.Add((string)method.Invoke(factory, parameters));
+                var binaryInstruction = (string)method.Invoke(this, parameters);
+                FullBinaryInstruction.Add(binaryInstruction);
             }
         }
 
@@ -104,11 +126,11 @@ namespace CIMArchitecture
             return regList;
         }
 
-        public static void PrintState(CIMFactory factory) 
+        public void PrintState(Configuration config) 
         {
             Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,14}", "CIM State");
             Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", "Registers", "Value");
-            foreach (var kvp in factory.Registers) 
+            foreach (var kvp in config.Registers) 
             {
                 Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", kvp.Value.Name, kvp.Value.DataValue);
             }
@@ -134,7 +156,9 @@ namespace CIMArchitecture
 
         private void ClearData() 
         {
-            _commands.Clear();
+            _userCommands.Clear();
+            UsedInstructions.Clear();
+            FullBinaryInstruction.Clear();
         }
 
         public static bool IsValidValue(int value, int limit)
@@ -146,9 +170,9 @@ namespace CIMArchitecture
         {
             if (!string.IsNullOrEmpty(source))
             {
-                if (_cimFactory.Registers.ContainsKey(source))
+                if (_configuration.Registers.ContainsKey(source))
                 {
-                    return _cimFactory.Registers[source];
+                    return _configuration.Registers[source];
                 }
             }
             throw new Exception("Source string is null or empty");
@@ -158,12 +182,34 @@ namespace CIMArchitecture
         {
             if (!string.IsNullOrEmpty(source))
             {
-                if (_cimFactory.Instructions.ContainsKey(source))
+                if (_configuration.Instructions.ContainsKey(source))
                 {
-                    return _cimFactory.Instructions[source];
+                    return _configuration.Instructions[source];
                 }
             }
             throw new Exception("Source string is null or empty");
         }
+
+        #region Instruction Methods
+        public string LoadImmediate(string instructionName, string source, string constant)
+        {
+            //Get destination register and instruction
+            var destReg = _configuration.Registers[source];
+            var instruction = _configuration.Instructions[instructionName];
+
+            if (destReg != null && instruction != null)
+            {
+                int _value;
+                Int32.TryParse(constant, out _value);
+
+                if (CIMCompiler.IsValidValue(_value, CIMCompiler._max16BitValue))
+                {
+                    destReg.DataValue += _value;
+                }
+            }
+            return $"{destReg.DataValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+        #endregion
+
     }
 }

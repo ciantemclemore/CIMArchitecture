@@ -8,11 +8,11 @@ namespace CIMArchitecture
     /// <summary>
     /// Defines the structure for an instruction
     /// </summary>
-    class Instruction : IEquatable<Instruction>
+    public class Instruction : IEquatable<Instruction>
     {
         public string Name { get; set; }
 
-        public string Value { get; set; }
+        public int Value { get; set; }
 
         public string FunctionName { get; set; }
 

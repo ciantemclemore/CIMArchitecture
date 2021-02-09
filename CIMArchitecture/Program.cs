@@ -1,15 +1,16 @@
-﻿using System;
+﻿using CIMArchitecture.Models;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace CIMArchitecture
 {
     class Program
     {
-        private static List<string> UserInput = new List<string>();
-
         static void Main(string[] args)
         {
-            CIMFactory factory = new CIMFactory();
+            var configuration = GetConfigurationData(@"C:\Users\Tay D'Von\source\repos\CIMArchitecture\CIMArchitecture\Database\Configuration.json");
 
             int userSelection = DisplayMenu();
 
@@ -23,8 +24,7 @@ namespace CIMArchitecture
                     switch (selection)
                     {
                         case 1:
-                            GatherUserInstructionCommands(factory);
-                            new CIMCompiler(factory, UserInput);
+                            new CIMCompiler(configuration);
                             break;
                         default: throw new Exception("Invalid selection");
                     }
@@ -36,9 +36,6 @@ namespace CIMArchitecture
                     {
                         runProg = false;
                     }
-
-                    //Before restarting, clean up
-                    UserInput.Clear();
                 }
             }
         }
@@ -50,26 +47,25 @@ namespace CIMArchitecture
             return Int32.Parse(Console.ReadLine());
         }
 
-        private static void GatherUserInstructionCommands(CIMFactory factory)
+        private static Configuration GetConfigurationData(string path) 
         {
-            string key = "run";
-            Console.WriteLine();
-            CIMCompiler.PrintState(factory);
-            Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
-            Console.WriteLine("Enter 'RUN' command once finished to compile");
-
-
-            while (true)
+            var jsonData = string.Empty;
+            var configuration = new Configuration();
+            try
             {
-
-                string instruction = Console.ReadLine();
-
-                if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase))
+                using (StreamReader sr = new StreamReader(path))
                 {
-                    break;
+                    jsonData = sr.ReadToEnd();
                 }
-                UserInput.Add(instruction);
+                configuration = JsonSerializer.Deserialize<Configuration>(jsonData);
+
             }
+            catch (IOException e)
+            {
+                Console.WriteLine("The file could not be read: ");
+                Console.WriteLine(e.Message);
+            }
+            return configuration;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace CIMArchitecture
             {
                 storage[length - 1 - i] = value % 2;
                 value /= 2;
-                binaryString += storage[i].ToString();
+                binaryString = storage[length - 1 - i].ToString() + binaryString;
             }
             return binaryString;
         }

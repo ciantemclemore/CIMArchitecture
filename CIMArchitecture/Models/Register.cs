@@ -6,13 +6,13 @@ namespace CIMArchitecture
     /// <summary>
     /// Defines the structure for a register.
     /// </summary>
-    class Register: IEquatable<Register>
+    public class Register: IEquatable<Register>
     {
         public string Name { get; set; }
 
         public int DataValue { get; set; }
 
-        public string BitValue { get; set; }
+        public int BitValue { get; set; }
 
         public bool Equals([AllowNull] Register other)
         {

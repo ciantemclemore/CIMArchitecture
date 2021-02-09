@@ -6,8 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Database\Configuration.json" />
     <None Remove="InstructionDatabase.json" />
     <None Remove="RegisterDatabase.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Database\Configuration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

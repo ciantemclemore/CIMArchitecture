@@ -10,7 +10,7 @@ namespace CIMArchitecture
     {
         static void Main(string[] args)
         {
-            var configuration = GetConfigurationData(@"C:\Users\Tay D'Von\source\repos\CIMArchitecture\CIMArchitecture\Database\Configuration.json");
+            var configuration = GetConfigurationData(@"Database\Configuration.json");
 
             int userSelection = DisplayMenu();
 

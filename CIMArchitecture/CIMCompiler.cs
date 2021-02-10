@@ -150,6 +150,13 @@ namespace CIMArchitecture
                 return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
             }
 
+            if ((!parameters[0].Equals(x)) && parameters.Count < 2 || (!parameters[0].Equals(y)) && parameters.Count < 2) 
+            {
+                return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
+            }
+
+            if (parameters.Count > 2) return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
+
             if (parameters.Count > 1 && parameters[1].ToRegister(_configuration) == null)
             {
                 var cmdValidation = new CommandValidation();
@@ -443,6 +450,12 @@ namespace CIMArchitecture
             firstReg.DataValue = 0;
 
             return result;
+        }
+
+        private Result CreateMemory(string instructionName, string first) 
+        {
+
+            return new Result();    
         }
         #endregion
 

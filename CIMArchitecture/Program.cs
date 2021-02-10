@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Linq;
+using MoreLinq;
 
 namespace CIMArchitecture
 {
@@ -11,6 +13,9 @@ namespace CIMArchitecture
     {
         static void Main(string[] args)
         {
+            //Increase window size by 25%
+            Console.SetWindowSize(Convert.ToInt32(Console.WindowWidth * 1.25), Convert.ToInt32(Console.WindowHeight * 1.25));
+
             var configuration = GetConfigurationData(@"Database\Configuration_Min.json");
             var compiler = new CIMCompiler(configuration);
 
@@ -88,11 +93,44 @@ namespace CIMArchitecture
 
         private static void PrintState(Configuration config)
         {
-            Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,14}", "CIM State");
-            Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", "Registers", "Value");
+            Console.WriteLine("\t\t\t\t\t\t\t\t\t\t{0,24}","CIM State");
+            Console.WriteLine("\t\t\t\t\t\t\t\t\t\t-----------------------------------------");
+            Console.WriteLine("\t\t\t\t\t\t\t\t\t\t{0,-20}", "Memory Storage");
+            Console.Write("\t\t\t\t\t\t\t\t\t\t");
+
+            //Print Memory Table
+            if (Memory.GetCount() > 0)
+            {
+                var rowCount = (Memory.GetCount() / 7) + 1;
+                var colCount = 7;
+                var memIndex = 0;
+                for (int i = 0; i < rowCount; i++)
+                {
+                    for (int j = 0; j < colCount; j++)
+                    {
+                        if (memIndex < Memory.GetCount())
+                        {
+                            Console.Write("{0} ", Memory.AsArray()[memIndex]);
+                            memIndex++;
+                        }
+                    }
+                    Console.WriteLine();
+                    Console.Write("\t\t\t\t\t\t\t\t\t\t");
+
+                }
+            }
+            else 
+            {
+                Console.Write("Empty");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("\t\t\t\t\t\t\t\t\t\t{0,-20} {1}", "Registers", "Values");
             foreach (var kvp in config.Registers)
             {
-                Console.WriteLine("\t\t\t\t\t\t\t\t\t{0,-12} {1,-8}", kvp.Value.Name, kvp.Value.DataValue);
+                Console.WriteLine("\t\t\t\t\t\t\t\t\t\t{0,-20} {1}", kvp.Value.Name, kvp.Value.DataValue);
             }
         }
 

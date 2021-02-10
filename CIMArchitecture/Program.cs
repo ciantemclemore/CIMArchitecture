@@ -11,7 +11,7 @@ namespace CIMArchitecture
     {
         static void Main(string[] args)
         {
-            var configuration = GetConfigurationData(@"Database\Configuration.json");
+            var configuration = GetConfigurationData(@"Database\Configuration_Min.json");
             var compiler = new CIMCompiler(configuration);
 
             bool runProg = true;
@@ -69,19 +69,19 @@ namespace CIMArchitecture
             while (true)
             {
                 string instruction = Console.ReadLine();
-                var isValid = compiler.IsValidCommand(instruction);
+                var commandValidation = compiler.IsValidCommand(instruction);
 
                 //If user enters 'run' command, its time to execute all commands, if any
                 if (instruction.Equals(key, StringComparison.OrdinalIgnoreCase)) break;
 
-                if (isValid)
+                if (commandValidation.IsValid)
                 {
                     //if the user enters a valid command, add to queue for execution
                     compiler.QueueCommand(instruction);
                 }
                 else 
                 {
-                    Console.WriteLine("Invalid instruction, register, or format. Enter command again:");
+                    Console.WriteLine(commandValidation.Message);
                 }
             }
         }
@@ -96,18 +96,18 @@ namespace CIMArchitecture
             }
         }
 
-        public static void PrintResults(Dictionary<string, Instruction> results)
+        public static void PrintResults(List<Result> results)
         {
             Console.WriteLine();
 
             //Header
-            Console.WriteLine("{0, -14} {1,-16} {2,-18}", "Name", "OPCODE", "32-Bit Instruction");
+            Console.WriteLine("{0, -14} {1,-16} {2, -29} {3,-18}", "Name", "OPCODE", "Error", "32-Bit Instruction");
 
             int i = 0;
-            foreach (var kvp in results)
+            foreach (var result in results)
             {
                 //Fix the spacing... opcodes are 8 characters so need to compensate
-                Console.WriteLine("{0,-14} {1,-16} {2,-18}", kvp.Value.Name, kvp.Value.Value, kvp.Key);
+                Console.WriteLine("{0,-14} {1,-16} {2, -29} {3,-18}", result.Instruction.Name, result.Instruction.Value, result.ErrorMessage, result.BinaryString);
                 i++;
 
             }

@@ -182,6 +182,8 @@ namespace CIMArchitecture
             return value <= limit;
         }
 
+        //Need a way to return message to the user if command values are outside the supported range value
+        //Max-range is 2^16 = 65k
         #region C-Format Instruction Methods
         private string Add(string instructionName, string source, string first, string second) 
         {
@@ -226,6 +228,81 @@ namespace CIMArchitecture
 
             return $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
         }
+
+        private string Multiple(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var secondReg = _configuration.Registers[second];
+            destReg.DataValue = (firstReg.DataValue * secondReg.DataValue);
+
+            return $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string MultiplyImmediate(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var immediate = Int32.Parse(second);
+            destReg.DataValue = (firstReg.DataValue * immediate);
+
+            return $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string Divide(string instructionName, string source, string first, string second) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var secondReg = _configuration.Registers[second];
+            
+            //Cannot divide by 0, must return message to user
+            if (secondReg.DataValue != 0) 
+            {
+                destReg.DataValue = (firstReg.DataValue / secondReg.DataValue);
+            }
+
+            return $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string DivideImmediate(string instructionName, string source, string first, string second)
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+            var immediate = Int32.Parse(second);
+
+            //Cannot divide by 0, must return message to user
+            if (immediate != 0) 
+            {
+                destReg.DataValue = (firstReg.DataValue / immediate);
+            }
+
+            return $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string Power(string instructionName, string source, string first)
+        {
+            //var instruction = _configuration.Instructions[instructionName];
+            //var destReg = _configuration.Registers[source];
+            //var firstReg = _configuration.Registers[first];
+
+            //var value = firstReg.DataValue * firstReg.DataValue * firstReg.DataValue;
+
+            //for (int i = 1; i < )
+
+            //    if (value > _max16BitValue)
+            //    {
+            //        throw new ArgumentOutOfRangeException("Result exceeds supported value limit");
+            //    }
+
+            //destReg.DataValue = value;
+            return string.Empty;
+            //return $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
         #endregion
 
         #region I-Format Instruction Methods
@@ -267,6 +344,102 @@ namespace CIMArchitecture
             }
             return $"{binString}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
         }
+
+        private string Square(string instructionName, string source, string first) 
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+
+            var value = firstReg.DataValue * firstReg.DataValue;
+            if (value > _max16BitValue) 
+            {
+                throw new ArgumentOutOfRangeException("Result exceeds supported value limit");
+            }
+
+            destReg.DataValue = value;
+
+            return $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string SquareImmediate(string instructionName, string source, string first)
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var immediate = Int32.Parse(first);
+
+            var value = immediate * immediate;
+            if (value > _max16BitValue)
+            {
+                throw new ArgumentOutOfRangeException("Result exceeds supported value limit");
+            }
+
+            destReg.DataValue = value;
+
+            return $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string Cube(string instructionName, string source, string first)
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+
+            var value = firstReg.DataValue * firstReg.DataValue * firstReg.DataValue;
+            if (value > _max16BitValue)
+            {
+                throw new ArgumentOutOfRangeException("Result exceeds supported value limit");
+            }
+
+            destReg.DataValue = value;
+
+            return $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+
+        private string CubeImmediate(string instructionName, string source, string first)
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var immediate = Int32.Parse(first);
+
+            var value = immediate * immediate * immediate;
+            if (value > _max16BitValue)
+            {
+                throw new ArgumentOutOfRangeException("Result exceeds supported value limit");
+            }
+
+            destReg.DataValue = value;
+
+            return $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+        }
+        private string Factorial(string instructionName, string source, string first)
+        {
+            var instruction = _configuration.Instructions[instructionName];
+            var destReg = _configuration.Registers[source];
+            var firstReg = _configuration.Registers[first];
+
+            int result = 1;
+            var temp = firstReg.DataValue;
+
+            try
+            {
+                while (temp > 0 && temp != 1)
+                {
+                    result = result * temp;
+                    temp -= 1;
+                }
+                if (result > _max16BitValue)
+                {
+                    throw new ArgumentOutOfRangeException("result exceeds supported value limit");
+                }
+            }
+            catch (ArgumentOutOfRangeException e) 
+            { 
+                Console.WriteLine(e.Message); 
+            }
+            return $"";
+        }
+
         #endregion
     }
 }

@@ -6,60 +6,91 @@ namespace CIMArchitecture.Models
 {
     public static class Memory
     {
-        private static Queue<int> _memoryBlock = new Queue<int>();
+        private static int _memSize;
+        private static int[] _memoryBlock;
 
-        public static bool Create(int size) 
+        public static void Create(int size) 
+        {
+            _memSize = size;
+            _memoryBlock = new int[size];
+            for (int i = 0; i < _memSize; i++) 
+            {
+                //-1 signifies an empty slot
+                _memoryBlock[i] = -1;
+            }
+        }
+
+        public static int GetFromMemory(int value) 
+        {
+            int result = -1;
+
+            for (int i = 0; i < _memoryBlock.Length; i++) 
+            {
+                if (_memoryBlock[i] == value) 
+                {
+                    result = _memoryBlock[i];
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public static bool StoreInMemory(int item)
         {
             bool status = false;
-
-            if (_memoryBlock == null) 
+            if (_memoryBlock != null) 
             {
-                _memoryBlock = new Queue<int>(size);
-                status = true;
+                for (int i = 0; i < _memSize; i++) 
+                {
+                    if (_memoryBlock[i] == -1) 
+                    {
+                        _memoryBlock[i] = item;
+                        status = true;
+                        return status;
+                    }
+                }
             }
             return status;
-        }
-
-        public static int GetFromMemory() 
-        {
-            return _memoryBlock.Count > 0 ? _memoryBlock.Dequeue() : 0;
-        }
-
-        public static void StoreInMemory(int item)
-        {
-            _memoryBlock.Enqueue(item);
         }
 
         public static bool MemoryCopy(int size) 
         {
-            var temp = new Queue<int>(size);
-            bool status = false;
+            var temp = new int[size];
 
-            if (temp.Count >= _memoryBlock.Count) 
+            if (_memoryBlock != null) 
             {
-                foreach (var block in _memoryBlock) 
+                for (int i = 0; i < size; i++) 
                 {
-                    temp.Enqueue(block);
+                    if (i < _memoryBlock.Length && _memoryBlock[i] != 0) 
+                    {
+                        temp[i] = _memoryBlock[i];
+                    }
                 }
-                _memoryBlock = new Queue<int>(temp);
-                status = true;
+                return true;
             }
-            return status;
+            return false;
         }
 
         public static void ClearMemory() 
         {
-            _memoryBlock.Clear();
+            for (int i = 0; i < _memSize; i++) 
+            {
+                _memoryBlock[i] = -1;
+            }
         }
 
         public static int GetCount() 
         {
-            return _memoryBlock.Count;
+            if (_memoryBlock != null) 
+            {
+                return _memoryBlock.Length;
+            }
+            return default;
         }
 
-        public static int[] AsArray() 
+        public static int[] GetMemBlock() 
         {
-            return _memoryBlock.ToArray();
+            return _memoryBlock;
         }
     }
 }

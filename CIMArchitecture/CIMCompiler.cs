@@ -227,7 +227,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue + secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue + secondReg.DataValue : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -243,7 +243,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue + immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue + immediate : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -259,7 +259,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue - secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue - secondReg.DataValue : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -275,7 +275,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue - immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue - immediate : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -291,7 +291,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue * secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue * secondReg.DataValue : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -307,7 +307,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(firstReg.DataValue * immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue * immediate : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -323,7 +323,7 @@ namespace CIMArchitecture
 
             bool isValid = (secondReg.DataValue != 0) && IsValidValue(firstReg.DataValue / secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue / secondReg.DataValue : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -339,7 +339,7 @@ namespace CIMArchitecture
 
             bool isValid = (immediate != 0) && IsValidValue(firstReg.DataValue / immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue / immediate : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -361,7 +361,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(value, _max16BitValue);
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -383,7 +383,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(value, _max16BitValue);
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -400,7 +400,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(value, _max16BitValue);
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -417,7 +417,7 @@ namespace CIMArchitecture
 
             bool isValid = IsValidValue(value, _max16BitValue);
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -454,8 +454,51 @@ namespace CIMArchitecture
 
         private Result CreateMemory(string instructionName, string first) 
         {
+            Instruction instruction = _configuration.Instructions[instructionName];
+            var value = first.ToRegister(_configuration);
+            string binString = string.Empty;
 
-            return new Result();    
+            if (value == null)
+            {
+                //User provided correct input, create memory
+                int memSize = Int32.Parse(first);
+                if (IsValidValue(memSize, _max16BitValue))
+                {
+                    binString = $"{memSize.ToBinary(24)}{instruction.Value.ToBinary(8)}";
+                    Memory.Create(memSize);
+                }
+            }
+            else 
+            {
+                //Invalid input
+                bool isReg = _configuration.Registers.ContainsKey(value.Name);
+                if (isReg) return new Result() { Instruction = instruction, ErrorMessage = "Invalid input", BinaryString = $"{0.ToBinary(32)}" };
+            }
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.NoErrorMessage };    
+        }
+
+        private Result StoreInMemory(string instructionName, string first) 
+        {
+            Instruction instruction = _configuration.Instructions[instructionName];
+            var value = first.ToRegister(_configuration);
+            string binString = string.Empty;
+
+            int valueToStore;
+
+            if (value == null)
+            {
+                //User provided correct an immediate value
+                valueToStore = Int32.Parse(first);
+                binString = $"{valueToStore.ToBinary(24)}{instruction.Value.ToBinary(8)}";
+            }
+            else 
+            {
+                valueToStore = value.DataValue;
+                binString = $"{valueToStore.ToBinary(24)}{instruction.Value.ToBinary(8)}";
+            }
+            var status = Memory.StoreInMemory(valueToStore);
+
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = status ? Result.NoErrorMessage : "Memory is full or null" };    
         }
         #endregion
 
@@ -472,7 +515,7 @@ namespace CIMArchitecture
 
             isValid = IsValidValue(immediate, _max16BitValue);
             destReg.DataValue = isValid ? immediate : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -488,7 +531,7 @@ namespace CIMArchitecture
             bool isValid = IsValidValue(value, _max16BitValue);
 
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -504,7 +547,7 @@ namespace CIMArchitecture
             bool isValid = IsValidValue(value, _max16BitValue);
 
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -520,7 +563,7 @@ namespace CIMArchitecture
             bool isValid = IsValidValue(value, _max16BitValue);
 
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -536,7 +579,7 @@ namespace CIMArchitecture
             bool isValid = IsValidValue(value, _max16BitValue);
 
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -561,7 +604,7 @@ namespace CIMArchitecture
 
             isValid = IsValidValue(total, _max16BitValue);
             destReg.DataValue = isValid ? total : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }
@@ -587,7 +630,7 @@ namespace CIMArchitecture
 
             isValid = IsValidValue(total, _max16BitValue);
             destReg.DataValue = isValid ? total : destReg.DataValue;
-            result.IsError = !isValid;
+            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
 
             return result;
         }

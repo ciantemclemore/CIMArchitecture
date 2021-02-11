@@ -12,7 +12,9 @@ namespace CIMArchitecture.Models
 
         public bool IsError { get; set; }
 
-        public string ErrorMessage => IsError ? "Value Not Supported" : "None";
+        public string ErrorMessage { get; set; }
 
+        public const string DefaultErrorMessage = "Value Not Supported";
+        public const string NoErrorMessage = "None";
     }
 }

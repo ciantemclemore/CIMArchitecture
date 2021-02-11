@@ -108,9 +108,9 @@ namespace CIMArchitecture
                 {
                     for (int j = 0; j < colCount; j++)
                     {
-                        if (memIndex < Memory.GetCount())
+                        if (memIndex < Memory.GetCount() && Memory.GetMemBlock()[memIndex] != -1)
                         {
-                            Console.Write("{0} ", Memory.AsArray()[memIndex]);
+                            Console.Write("{0} ", Memory.GetMemBlock()[memIndex]);
                             memIndex++;
                         }
                     }

@@ -19,8 +19,6 @@ namespace CIMArchitecture
 
         private const int _max16BitValue = 65536;
 
-        private const int _max8BitValue = 256;
-
         public CIMCompiler(Configuration config)
         {
             _configuration = config;
@@ -131,7 +129,7 @@ namespace CIMArchitecture
                 if (i == parameters.Count - 1 && parameter == null)
                 {
                     var cmdValidation = new CommandValidation();
-                    cmdValidation.IsValid = IsValidValue(Int32.Parse(parameters[i]), _max8BitValue);
+                    cmdValidation.IsValid = IsValidValue(Int32.Parse(parameters[i]), _max16BitValue);
                     cmdValidation.Message = cmdValidation.IsValid ? string.Empty : "Value not supported. Try again:";
                     return cmdValidation;
                 }

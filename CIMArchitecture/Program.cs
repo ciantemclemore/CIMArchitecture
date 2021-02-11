@@ -31,7 +31,7 @@ namespace CIMArchitecture
                         PrintState(configuration);
                         PrintResults(results);
                         break;
-                    case 4:
+                    case 2:
                         runProg = false;
                         break;
                     default: Console.WriteLine("Invalid selection. Try Again:");
@@ -44,7 +44,7 @@ namespace CIMArchitecture
         private static int DisplayMenu() 
         {
             Console.WriteLine("1. IDE");
-            Console.WriteLine("4. Exit");
+            Console.WriteLine("2. Exit");
             
             int selectionValue;
             var isValid = Int32.TryParse(Console.ReadLine(), out selectionValue);
@@ -66,7 +66,7 @@ namespace CIMArchitecture
             Console.WriteLine();
             PrintState(config);
             Console.WriteLine("Enter instructions: (Press enter after entering each instruction)");
-            Console.WriteLine("Enter 'RUN' command once finished to compile");
+            Console.WriteLine("Enter 'Run' command once finished to compile");
 
             while (true)
             {

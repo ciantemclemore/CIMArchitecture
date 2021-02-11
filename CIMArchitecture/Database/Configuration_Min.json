@@ -116,85 +116,85 @@
     },
     "cmod": {
       "Name": "cmod",
-      "Value": 15,
+      "Value": 16,
       "FunctionName": "Modulo",
       "Format": "C"
     },
     "cmodi": {
       "Name": "cmodi",
-      "Value": 16,
+      "Value": 17,
       "FunctionName": "ModuloImmediate",
       "Format": "C"
     },
     "cfact": {
       "Name": "cfact",
-      "Value": 17,
+      "Value": 19,
       "FunctionName": "Factorial",
       "Format": "M"
     },
     "cfacti": {
       "Name": "cfacti",
-      "Value": 18,
+      "Value": 20,
       "FunctionName": "FactorialImmediate",
       "Format": "M"
     },
     "cli": {
       "Name": "cli",
-      "Value": 19,
+      "Value": 41,
       "FunctionName": "LoadImmediate",
       "Format": "M"
     },
     "cmove": {
       "Name": "cmove",
-      "Value": 20,
+      "Value": 42,
       "FunctionName": "Move",
       "Format": "M"
     },
     "cswap": {
       "Name": "cswap",
-      "Value": 21,
+      "Value": 43,
       "FunctionName": "Swap",
       "Format": "M"
     },
     "cdelete1": {
       "Name": "cdelete1",
-      "Value": 22,
+      "Value": 44,
       "FunctionName": "Delete",
       "Format": "I"
     },
     "cdeleteall": {
       "Name": "cdeleteall",
-      "Value": 23,
+      "Value": 45,
       "FunctionName": "DeleteAll",
       "Format": "I"
     },
     "ccreate": {
       "Name": "ccreate",
-      "Value": 24,
+      "Value": 46,
       "FunctionName": "CreateMemory",
       "Format": "I"
     },
     "cmemcopy": {
       "Name": "cmemcopy",
-      "Value": 25,
+      "Value": 47,
       "FunctionName": "MemoryCopy",
       "Format": "I"
     },
     "cstore": {
       "Name": "cstore",
-      "Value": 26,
+      "Value": 48,
       "FunctionName": "StoreInMemory",
       "Format": "I"
     },
     "cloadi": {
       "Name": "cloadi",
-      "Value": 27,
+      "Value": 49,
       "FunctionName": "LoadFromMemory",
       "Format": "M"
     },
     "cclear": {
       "Name": "cclear",
-      "Value": 28,
+      "Value": 50,
       "FunctionName": "ClearMemory",
       "Format": "I"
     }

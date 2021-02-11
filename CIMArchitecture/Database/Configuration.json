@@ -318,11 +318,11 @@
       "FunctionName": "StoreInMemory",
       "Format": "I"
     },
-    "cload": {
-      "Name": "cload",
+    "cloadi": {
+      "Name": "cloadi",
       "Value": 49,
       "FunctionName": "LoadFromMemory",
-      "Format": "I"
+      "Format": "M"
     },
     "cclear": {
       "Name": "cclear",

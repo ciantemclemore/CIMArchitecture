@@ -121,6 +121,9 @@ namespace CIMArchitecture
             if (instruction.Name.EndsWith('i') && lastParameter != null)
                 return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
 
+            if (parameters.Count != 4)
+                return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
+
             for (int i = 1; i < parameters.Count; i++)
             {
                 var parameter = parameters[i].ToRegister(_configuration);
@@ -150,7 +153,7 @@ namespace CIMArchitecture
                 return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
             }
 
-            if ((!parameters[0].Equals(x)) && parameters.Count < 2 || (!parameters[0].Equals(y)) && parameters.Count < 2) 
+            if (!parameters[0].Equals(x) && parameters.Count < 2 && !parameters[0].Equals(y) && parameters.Count < 2)
             {
                 return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
             }
@@ -181,6 +184,9 @@ namespace CIMArchitecture
             if (instruction.Name.EndsWith('i') && lastParameter != null)
                 return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
 
+            if(parameters.Count != 3)
+                return new CommandValidation() { IsValid = false, Message = "Incorrect instruction format. Try again:" };
+
             //Here we check to see if the first parameter is a valid register
             //If first parameter is valid, we check to see if the second parameter is valid
             //Second parameter must be a valid immediate value or register
@@ -208,7 +214,7 @@ namespace CIMArchitecture
             _results.Clear();
         }
 
-        private bool IsValidValue(int value, int limit)
+        private bool IsValidValue(long value, int limit)
         {
             return Math.Abs(value) <= limit;
         }
@@ -222,14 +228,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue + secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue + secondReg.DataValue : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result AddImmediate(string instructionName, string source, string first, string second)
@@ -238,14 +242,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue + immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue + immediate : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() {Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Subtract(string instructionName, string source, string first, string second)
@@ -254,14 +256,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue - secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue - secondReg.DataValue : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result SubtractImmediate(string instructionName, string source, string first, string second)
@@ -270,14 +270,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue - immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue - immediate : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Multiple(string instructionName, string source, string first, string second)
@@ -286,14 +284,12 @@ namespace CIMArchitecture
             var destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue * secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue * secondReg.DataValue : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result MultiplyImmediate(string instructionName, string source, string first, string second)
@@ -302,14 +298,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
 
             bool isValid = IsValidValue(firstReg.DataValue * immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue * immediate : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Divide(string instructionName, string source, string first, string second)
@@ -318,14 +312,15 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+
+            if (secondReg.DataValue == 0)
+                return new Result() { Instruction = instruction, BinaryString = $"{0.ToBinary(32)}", ErrorMessage = "Divide by 0" };
 
             bool isValid = (secondReg.DataValue != 0) && IsValidValue(firstReg.DataValue / secondReg.DataValue, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue / secondReg.DataValue : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() {Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result DivideImmediate(string instructionName, string source, string first, string second)
@@ -334,14 +329,15 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+
+            if (immediate == 0)
+                return new Result() { Instruction = instruction, BinaryString = $"{0.ToBinary(32)}", ErrorMessage = "Divide by 0" };
 
             bool isValid = (immediate != 0) && IsValidValue(firstReg.DataValue / immediate, _max16BitValue);
             destReg.DataValue = isValid ? firstReg.DataValue / immediate : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Power(string instructionName, string source, string first, string second)
@@ -350,20 +346,14 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = firstReg.DataValue;
 
-            for (int i = 0; i < secondReg.DataValue; i++)
-            {
-                value *= value;
-            }
+            var powerResult = Math.Pow(firstReg.DataValue, secondReg.DataValue);
 
-            bool isValid = IsValidValue(value, _max16BitValue);
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            bool isValid = IsValidValue(Convert.ToInt64(powerResult), _max16BitValue);
+            destReg.DataValue = isValid ? Convert.ToInt32(powerResult) : destReg.DataValue;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result PowerImmediate(string instructionName, string source, string first, string second)
@@ -372,20 +362,14 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = firstReg.DataValue;
 
-            for (int i = 0; i < immediate; i++)
-            {
-                value *= value;
-            }
+            var powerResult = Math.Pow(firstReg.DataValue, immediate);
 
-            bool isValid = IsValidValue(value, _max16BitValue);
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            bool isValid = IsValidValue(Convert.ToInt64(powerResult), _max16BitValue);
+            destReg.DataValue = isValid ? Convert.ToInt32(powerResult) : destReg.DataValue;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Modulo(string instructionName, string source, string first, string second)
@@ -394,15 +378,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             Register secondReg = _configuration.Registers[second];
-            string binString = $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = Math.Abs(firstReg.DataValue % secondReg.DataValue);
 
-            bool isValid = IsValidValue(value, _max16BitValue);
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            bool isValid = IsValidValue(firstReg.DataValue % secondReg.DataValue, _max16BitValue);
+            destReg.DataValue = isValid ? firstReg.DataValue % secondReg.DataValue : destReg.DataValue;
+            string binString = isValid ? $"{secondReg.BitValue.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result ModuloImmediate(string instructionName, string source, string first, string second)
@@ -411,15 +392,12 @@ namespace CIMArchitecture
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
             int immediate = Int32.Parse(second);
-            string binString = $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = Math.Abs(firstReg.DataValue % immediate);
 
-            bool isValid = IsValidValue(value, _max16BitValue);
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            bool isValid = IsValidValue(firstReg.DataValue % immediate, _max16BitValue);
+            destReg.DataValue = isValid ? firstReg.DataValue % immediate : destReg.DataValue;
+            string binString = isValid ? $"{immediate.ToBinary(8)}{firstReg.BitValue.ToBinary(8)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         #endregion
@@ -429,7 +407,7 @@ namespace CIMArchitecture
         {
             Instruction instruction = _configuration.Instructions[instructionName];
             string binString = $"{0.ToBinary(24)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+            Result result = new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = Result.NoErrorMessage };
 
             //Delete all values out of registers
             foreach (var reg in _configuration.Registers)
@@ -444,7 +422,7 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register firstReg = _configuration.Registers[first];
             string binString = $"{firstReg.BitValue.ToBinary(24)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+            Result result = new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = Result.NoErrorMessage };
 
             //Set value back to default
             firstReg.DataValue = 0;
@@ -452,53 +430,83 @@ namespace CIMArchitecture
             return result;
         }
 
-        private Result CreateMemory(string instructionName, string first) 
+        private Result CreateMemory(string instructionName, string first)
         {
             Instruction instruction = _configuration.Instructions[instructionName];
-            var value = first.ToRegister(_configuration);
+            var parameter = first.ToRegister(_configuration);
             string binString = string.Empty;
 
-            if (value == null)
+            int memSize;
+
+            //Determine if the value is an immediate or register
+            memSize = parameter == null ? Int32.Parse(first) : parameter.DataValue;
+
+            var isValid = IsValidValue(memSize, _max16BitValue);
+            binString = isValid ? $"{memSize.ToBinary(24)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
+
+            if (isValid)
             {
-                //User provided correct input, create memory
-                int memSize = Int32.Parse(first);
-                if (IsValidValue(memSize, _max16BitValue))
-                {
-                    binString = $"{memSize.ToBinary(24)}{instruction.Value.ToBinary(8)}";
-                    Memory.Create(memSize);
-                }
+                Memory.Create(memSize);
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.NoErrorMessage };
             }
-            else 
-            {
-                //Invalid input
-                bool isReg = _configuration.Registers.ContainsKey(value.Name);
-                if (isReg) return new Result() { Instruction = instruction, ErrorMessage = "Invalid input", BinaryString = $"{0.ToBinary(32)}" };
-            }
-            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.NoErrorMessage };    
+
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.DefaultErrorMessage };
         }
 
-        private Result StoreInMemory(string instructionName, string first) 
+        private Result StoreInMemory(string instructionName, string first)
         {
             Instruction instruction = _configuration.Instructions[instructionName];
-            var value = first.ToRegister(_configuration);
-            string binString = string.Empty;
+            var parameter = first.ToRegister(_configuration);
 
             int valueToStore;
 
-            if (value == null)
-            {
-                //User provided correct an immediate value
-                valueToStore = Int32.Parse(first);
-                binString = $"{valueToStore.ToBinary(24)}{instruction.Value.ToBinary(8)}";
-            }
-            else 
-            {
-                valueToStore = value.DataValue;
-                binString = $"{valueToStore.ToBinary(24)}{instruction.Value.ToBinary(8)}";
-            }
-            var status = Memory.StoreInMemory(valueToStore);
+            valueToStore = parameter == null ? Int32.Parse(first) : parameter.DataValue;
 
-            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = status ? Result.NoErrorMessage : "Memory is full or null" };    
+            var isValid = IsValidValue(valueToStore, _max16BitValue);
+
+            if (isValid)
+            {
+                //Now see if we have space in memory
+                var status = Memory.StoreInMemory(valueToStore);
+                var binString = status.IsValid ? $"{valueToStore.ToBinary(24)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
+
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = status.Message };
+            }
+
+            return new Result() { BinaryString = $"{0.ToBinary(32)}", Instruction = instruction, ErrorMessage = Result.DefaultErrorMessage };
+        }
+
+        private Result MemoryCopy(string instructionName, string first)
+        {
+            Instruction instruction = _configuration.Instructions[instructionName];
+            var parameter = first.ToRegister(_configuration);
+            string binString = string.Empty;
+
+            int newMemSize;
+
+            //Determine if the value is an immediate or register
+            newMemSize = parameter == null ? Int32.Parse(first) : parameter.DataValue;
+
+            var isValid = IsValidValue(newMemSize, _max16BitValue);
+            binString = isValid ? $"{newMemSize.ToBinary(24)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
+
+            if (isValid)
+            {
+                var status = Memory.MemoryCopy(newMemSize);
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = status.Message };
+            }
+
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.DefaultErrorMessage };
+        }
+
+        private Result ClearMemory(string instructionName)
+        {
+            Instruction instruction = _configuration.Instructions[instructionName];
+
+            var status = Memory.ClearMemory();
+            string binString = status.IsValid ? $"{0.ToBinary(24)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
+
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = status.Message };
         }
         #endregion
 
@@ -509,15 +517,43 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             int immediate = int.Parse(first);
-            string binString = $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            bool isValid;
 
-            isValid = IsValidValue(immediate, _max16BitValue);
+            bool isValid = IsValidValue(immediate, _max16BitValue);
             destReg.DataValue = isValid ? immediate : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
+        }
+
+        private Result LoadFromMemory(string instructionName, string source, string first)
+        {
+            Instruction instruction = _configuration.Instructions[instructionName];
+            Register destReg = _configuration.Registers[source];
+            var parameter = first.ToRegister(_configuration);
+            string binString = 0.ToBinary(32); //default, if function results in error
+
+            if (parameter != null)
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = "Must provide immediate value" };
+
+
+            int valueToLoad = Int32.Parse(first);
+            var result = Memory.LoadFromMemory(valueToLoad);
+
+            if (result == -1)
+            {
+                //Value not in memory
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = "Value not in memory" };
+            }
+            else if (result == -2) 
+            {
+                //Memory is null
+                return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = "Memory is null" };
+            }
+
+            destReg.DataValue = result;
+            binString = $"{valueToLoad.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
+
+            return new Result() { BinaryString = binString, Instruction = instruction, ErrorMessage = Result.DefaultErrorMessage };
         }
 
         private Result Square(string instructionName, string source, string first)
@@ -525,15 +561,13 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
-            string binString = $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+
             int value = firstReg.DataValue * firstReg.DataValue;
             bool isValid = IsValidValue(value, _max16BitValue);
-
             destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() {Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result SquareImmediate(string instructionName, string source, string first)
@@ -541,15 +575,13 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             int immediate = Int32.Parse(first);
-            string binString = $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = immediate * immediate;
-            bool isValid = IsValidValue(value, _max16BitValue);
 
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            var value = Math.Pow(immediate, 2);
+            bool isValid = IsValidValue((Int64)value, _max16BitValue);
+            destReg.DataValue = isValid ? (Int32)value : destReg.DataValue;
+            string binString = isValid ? $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Cube(string instructionName, string source, string first)
@@ -557,15 +589,13 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
-            string binString = $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = firstReg.DataValue * firstReg.DataValue * firstReg.DataValue;
-            bool isValid = IsValidValue(value, _max16BitValue);
+            
+            var value = Math.Pow(firstReg.DataValue, 3);
+            bool isValid = IsValidValue((Int64)value, _max16BitValue);
+            destReg.DataValue = isValid ? (Int32)value : destReg.DataValue;
+            string binString = isValid ? $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
-
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result CubeImmediate(string instructionName, string source, string first)
@@ -573,23 +603,23 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             int immediate = Int32.Parse(first);
-            string binString = $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
-            int value = immediate * immediate * immediate;
-            bool isValid = IsValidValue(value, _max16BitValue);
+            
+            var value = Math.Pow(immediate, 3);
+            bool isValid = IsValidValue((Int64)value, _max16BitValue);
+            destReg.DataValue = isValid ? (Int32)value : destReg.DataValue;
+            string binString = isValid ? $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            destReg.DataValue = isValid ? value : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
-
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
         private Result Factorial(string instructionName, string source, string first)
         {
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             Register firstReg = _configuration.Registers[first];
-            string binString = $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+            
+            //Anything greater than or equal to this value is not supported
+            if (firstReg.DataValue >= 9)
+                return new Result() { Instruction = instruction, BinaryString = $"{0.ToBinary(32)}", ErrorMessage = Result.DefaultErrorMessage };
 
             int total = 1;
             var temp = firstReg.DataValue;
@@ -604,9 +634,9 @@ namespace CIMArchitecture
 
             isValid = IsValidValue(total, _max16BitValue);
             destReg.DataValue = isValid ? total : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{firstReg.BitValue.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() {Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result FactorialImmediate(string instructionName, string source, string first)
@@ -614,12 +644,14 @@ namespace CIMArchitecture
             Instruction instruction = _configuration.Instructions[instructionName];
             Register destReg = _configuration.Registers[source];
             int immediate = Int32.Parse(first);
-            string binString = $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}";
-            Result result = new Result() { Instruction = instruction, BinaryString = binString };
+
+            if (immediate >= 9)
+                return new Result() { Instruction = instruction, BinaryString = $"{0.ToBinary(32)}", ErrorMessage = Result.DefaultErrorMessage };
 
             int total = 1;
             var temp = immediate;
             bool isValid;
+                
 
             //Simple factorial function
             while (temp > 0 && temp != 1)
@@ -630,9 +662,9 @@ namespace CIMArchitecture
 
             isValid = IsValidValue(total, _max16BitValue);
             destReg.DataValue = isValid ? total : destReg.DataValue;
-            result.ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage;
+            string binString = isValid ? $"{immediate.ToBinary(16)}{destReg.BitValue.ToBinary(8)}{instruction.Value.ToBinary(8)}" : $"{0.ToBinary(32)}";
 
-            return result;
+            return new Result() { Instruction = instruction, BinaryString = binString, ErrorMessage = isValid ? Result.NoErrorMessage : Result.DefaultErrorMessage };
         }
 
         private Result Move(string instructionName, string first, string second)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CIMArchitecture.Models
 {
-    class CommandValidation
+    public class CommandValidation
     {
         public bool IsValid { get; set; } = true;
 

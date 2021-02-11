@@ -13,9 +13,6 @@ namespace CIMArchitecture
     {
         static void Main(string[] args)
         {
-            //Increase window size by 25%
-            Console.SetWindowSize(Convert.ToInt32(Console.WindowWidth * 1.25), Convert.ToInt32(Console.WindowHeight * 1.25));
-
             var configuration = GetConfigurationData(@"Database\Configuration_Min.json");
             var compiler = new CIMCompiler(configuration);
 
@@ -99,7 +96,11 @@ namespace CIMArchitecture
             Console.Write("\t\t\t\t\t\t\t\t\t\t");
 
             //Print Memory Table
-            if (Memory.GetCount() > 0)
+            if (Memory.GetCount() == -1) 
+            {
+                Console.Write("NULL");
+            }
+            else if (Memory.GetCountOfValues() != -1 && Memory.GetCountOfValues() > 0)
             {
                 var rowCount = (Memory.GetCount() / 7) + 1;
                 var colCount = 7;

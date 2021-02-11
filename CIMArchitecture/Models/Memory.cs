@@ -6,77 +6,131 @@ namespace CIMArchitecture.Models
 {
     public static class Memory
     {
-        private static int _memSize;
         private static int[] _memoryBlock;
 
         public static void Create(int size) 
         {
-            _memSize = size;
             _memoryBlock = new int[size];
-            for (int i = 0; i < _memSize; i++) 
+            for (int i = 0; i < _memoryBlock.Length; i++) 
             {
                 //-1 signifies an empty slot
                 _memoryBlock[i] = -1;
             }
         }
 
-        public static int GetFromMemory(int value) 
+        public static int LoadFromMemory(int value) 
         {
-            int result = -1;
+            //Value not in memory
+            int exitCode1 = -1;
 
-            for (int i = 0; i < _memoryBlock.Length; i++) 
+            //Memory null
+            int exitCode2 = -2;
+
+            if (_memoryBlock != null)
             {
-                if (_memoryBlock[i] == value) 
+                for (int i = 0; i < _memoryBlock.Length; i++)
                 {
-                    result = _memoryBlock[i];
-                    break;
+                    if (_memoryBlock[i] == value)
+                    {
+                        return _memoryBlock[i];
+                    }
                 }
-            }
-            return result;
+                return exitCode1;
+            }else
+                return exitCode2;
         }
 
-        public static bool StoreInMemory(int item)
+        public static CommandValidation StoreInMemory(int item)
         {
-            bool status = false;
-            if (_memoryBlock != null) 
+            if (_memoryBlock != null)
             {
-                for (int i = 0; i < _memSize; i++) 
+                for (int i = 0; i < _memoryBlock.Length; i++)
+                {
+                    if (_memoryBlock[i] == -1)
+                    {
+                        _memoryBlock[i] = item;
+                        return new CommandValidation() { IsValid = true, Message = Result.NoErrorMessage };
+                    }
+                }
+            }
+            else 
+            {
+                return new CommandValidation() { IsValid = false, Message = "Memory was not created" };
+            }
+            return new CommandValidation() { IsValid = false, Message = "Memory is full" };
+        }
+
+        public static CommandValidation MemoryCopy(int size) 
+        {
+            var temp = new int[size];
+            int count = 0;
+
+            if (_memoryBlock != null)
+            {   
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    if (i == _memoryBlock.Length) break;
+                    if (_memoryBlock[i] == -1) break;
+
+                    if (i < _memoryBlock.Length && _memoryBlock[i] != -1)
+                    {
+                        temp[i] = _memoryBlock[i];
+                        count++;
+                    }
+                }
+                //Now specify new array size and initialize empty spots as -1
+                _memoryBlock = new int[size];
+                
+                for(int i = 0; i < _memoryBlock.Length; i++) 
+                {
+                    _memoryBlock[i] = -1;
+                }
+
+                //Now copy temp to memoryBlock array
+                for (int i = 0; i < count; i++) 
                 {
                     if (_memoryBlock[i] == -1) 
                     {
-                        _memoryBlock[i] = item;
-                        status = true;
-                        return status;
+                        _memoryBlock[i] = temp[i];
                     }
                 }
             }
-            return status;
+            else 
+            {
+                return new CommandValidation() { IsValid = false, Message = "Memory was not created" };
+            }
+            return new CommandValidation() { IsValid = true, Message = Result.NoErrorMessage }; ;
         }
 
-        public static bool MemoryCopy(int size) 
+        public static CommandValidation ClearMemory() 
         {
-            var temp = new int[size];
+            if (_memoryBlock != null)
+            {
+                for (int i = 0; i < _memoryBlock.Length; i++)
+                {
+                    _memoryBlock[i] = -1;
+                }
+            }
+            else 
+            {
+                return new CommandValidation() { IsValid = false, Message = "Memory was not created" };
+            }
+            return new CommandValidation() { IsValid = true, Message = Result.NoErrorMessage }; ;
+        }
 
+        public static int GetCountOfValues() 
+        {
+            int count = 0;
             if (_memoryBlock != null) 
             {
-                for (int i = 0; i < size; i++) 
+                for (int i = 0; i < _memoryBlock.Length; i++)
                 {
-                    if (i < _memoryBlock.Length && _memoryBlock[i] != 0) 
-                    {
-                        temp[i] = _memoryBlock[i];
-                    }
+                    if (_memoryBlock[i] != -1)
+                        count++;
                 }
-                return true;
+                return count;
             }
-            return false;
-        }
-
-        public static void ClearMemory() 
-        {
-            for (int i = 0; i < _memSize; i++) 
-            {
-                _memoryBlock[i] = -1;
-            }
+            return -1;
         }
 
         public static int GetCount() 
@@ -85,7 +139,7 @@ namespace CIMArchitecture.Models
             {
                 return _memoryBlock.Length;
             }
-            return default;
+            return -1;
         }
 
         public static int[] GetMemBlock() 
